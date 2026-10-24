@@ -1,0 +1,64 @@
+{# Result of a match: per team the MVP card on top, then the ranking. #}
+{% import 'partials/macros.html.twig' as m %}
+{% set present = present ?? false %}
+<div data-status="{{ match.status }}">
+  <div class="results__meta">
+    <span>{{ results.ballots == 1 ? t('results.ballots_total_one') : t('results.ballots_total', {count: results.ballots|num}) }}</span>
+    {% if match.status == 'open' %}<span class="live-dot">{{ t('results.live') }}</span>{% else %}<span>{{ t('results.final') }}</span>{% endif %}
+  </div>
+  <div class="results">
+    {% for team in results.teams %}
+      <section class="team-result team-{{ team.team_id }}" aria-label="{{ team.name }}">
+        <header class="team-result__head">
+          {{ m.team_logo(team.logo, team.name, team.team_id) }}
+          <h2 class="team-result__name">{{ team.name }}</h2>
+          <span class="team-result__count">{{ team.votes == 1 ? t('results.votes_one') : t('results.votes', {count: team.votes|num}) }}</span>
+        </header>
+
+        {% if team.winners %}
+          <div class="mvp">
+            <span class="mvp__label">{{ m.crown('crown') }}{{ brand.award_label }}</span>
+            <div class="mvp__people{{ team.tie ? ' mvp__people--tie' }}">
+              {% for w in team.winners %}
+                <div class="mvp__person">
+                  {{ m.crown('mvp__crown') }}
+                  {{ m.avatar(w, '', team.team_id) }}
+                  <div class="mvp__name">{{ w.name }}</div>
+                  {% if w.number is not null or w.position %}
+                    <div class="mvp__number">{% if w.number is not null %}#{{ w.number }}{% endif %}{% if w.number is not null and w.position %} · {% endif %}{{ w.position }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+            <div class="mvp__score">
+              <span class="mvp__percent">{{ team.winners[0].percent|num(team.winners[0].percent == team.winners[0].percent|round ? 0 : 1) }}&nbsp;%</span>
+              <span class="mvp__votes">{{ team.winners[0].votes == 1 ? t('results.votes_one') : t('results.votes', {count: team.winners[0].votes|num}) }}</span>
+            </div>
+            {% if team.tie %}<span class="mvp__tie">{{ t('results.tie') }}</span>{% endif %}
+          </div>
+        {% else %}
+          <div class="mvp mvp--empty">
+            <span class="mvp__label">{{ m.crown('crown') }}{{ brand.award_label }}</span>
+            <div class="mvp__people"><div class="mvp__person"><span class="avatar" aria-hidden="true">?</span><div>{{ team.players ? t('results.votes_none') : t('results.no_players') }}</div></div></div>
+          </div>
+        {% endif %}
+
+        {% if team.players %}
+          <ol class="ranking">
+            {% for p in team.players %}
+              <li class="ranking__item{{ p.is_winner ? ' is-winner' }}">
+                <span class="ranking__rank">{{ p.votes > 0 ? p.rank : '–' }}</span>
+                {{ m.avatar(p, 'sm', team.team_id) }}
+                <div class="ranking__body">
+                  <div class="ranking__name">{% if p.number is not null %}<span class="number">{{ p.number }}</span>{% endif %}{{ p.name }}</div>
+                  <svg class="bar" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true"><rect class="bar__bg" width="100" height="8" rx="4"/>{% if p.bar > 0 %}<rect class="bar__fill" width="{{ p.bar }}" height="8" rx="4"/>{% endif %}</svg>
+                </div>
+                <div class="ranking__value"><strong>{{ p.votes|num }}</strong><span>{{ p.percent|num(p.percent == p.percent|round ? 0 : 1) }} %</span></div>
+              </li>
+            {% endfor %}
+          </ol>
+        {% endif %}
+      </section>
+    {% endfor %}
+  </div>
+</div>

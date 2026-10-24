@@ -1,0 +1,21 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('poster.title') }}{% endblock %}
+
+{% block content %}
+  <div class="page-head no-print">
+    <div>
+      <h1 class="h1">{{ t('poster.title') }}</h1>
+      <p class="lead">{{ t('poster.help') }}</p>
+    </div>
+    <button type="button" class="btn btn--primary" data-print>{{ t('poster.print') }}</button>
+  </div>
+  <article class="poster card">
+    {% if brand.logo %}<img src="{{ media(brand.logo) }}" alt="" class="poster__logo">{% else %}{{ m.crown('crown') }}{% endif %}
+    <h2 class="poster__title">{{ t('poster.headline', {award: brand.award_label}) }}</h2>
+    <p class="poster__text">{{ t('poster.text') }}</p>
+    <img src="{{ qr }}" alt="QR-Code: {{ vote_url }}" class="poster__qr">
+    <p class="poster__url">{{ vote_url|replace({'https://': '', 'http://': ''}) }}</p>
+  </article>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ match.home_name }} {{ t('app.vs') }} {{ match.away_name }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <p class="breadcrumb"><a href="{{ url('/admin/matches') }}">← {{ t('matches.title') }}</a></p>
+      <h1 class="h1">{{ m.matchup_names(match) }}</h1>
+      <p class="lead">{{ m.match_meta(match) }}</p>
+    </div>
+    <a href="{{ url('/admin/matches/' ~ match.id ~ '/edit') }}" class="btn btn--secondary">{{ t('app.edit') }}</a>
+  </div>
+
+  <div class="layout-2">
+    <div class="stack-lg">
+      {% if lineup_locked %}<div class="notice">{{ t('matches.lineup_locked') }}</div>{% endif %}
+      {% for side in sides %}
+        <section class="card stack team-{{ side.team_id }}" id="team-{{ side.team_id }}" aria-labelledby="lineup-{{ side.team_id }}">
+          <div class="section-title">
+            <div class="row">
+              {{ m.team_logo(side.logo, side.name, side.team_id) }}
+              <div>
+                <h2 class="h2" id="lineup-{{ side.team_id }}">{{ side.name }}</h2>
+                <p class="muted small">{{ t('matches.lineup') }} · {{ t('matches.' ~ side.side) }}</p>
+              </div>
+            </div>
+            {% if side.squads and not lineup_locked %}
+              <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/lineup') }}" class="row">
+                {{ csrf_field() }}
+                <input type="hidden" name="team" value="{{ side.team_id }}">
+                <label class="visually-hidden" for="squad-{{ side.team_id }}">{{ t('matches.apply_squad') }}</label>
+                <div class="field">
+                  <select id="squad-{{ side.team_id }}" name="apply_squad">
+                    {% for s in side.squads %}<option value="{{ s.id }}">{{ t('matches.apply_squad') }}: {{ s.name }}</option>{% endfor %}
+                  </select>
+                </div>
+                <button type="submit" class="btn btn--secondary btn--small">{{ t('matches.apply') }}</button>
+              </form>
+            {% endif %}
+          </div>
+
+          {% if side.players %}
+            <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/lineup') }}" class="stack" data-checklist>
+              {{ csrf_field() }}
+              <input type="hidden" name="team" value="{{ side.team_id }}">
+              <div class="lineup__tools">
+                <span class="muted">{{ t('matches.lineup_help') }} <strong data-check-count data-template="{{ t('matches.lineup_count', {count: '{n}', total: '{total}'}) }}">{{ t('matches.lineup_count', {count: side.lineup|length, total: side.players|length}) }}</strong></span>
+                {% if not lineup_locked %}
+                  <span class="row">
+                    <button type="button" class="btn btn--secondary btn--small" data-check-all="1" hidden>{{ t('squads.all') }}</button>
+                    <button type="button" class="btn btn--secondary btn--small" data-check-all="0" hidden>{{ t('squads.none') }}</button>
+                  </span>
+                {% endif %}
+              </div>
+              <div class="lineup">
+                {% for p in side.players %}
+                  <label class="lineup__item">
+                    <input type="checkbox" name="players[]" value="{{ p.id }}"{{ p.id in side.lineup ? ' checked' }}{{ lineup_locked ? ' disabled' }}>
+                    {{ m.avatar(p, 'sm', side.team_id) }}
+                    <span class="lineup__name">{% if p.number is not null %}<span class="number">{{ p.number }}</span> {% endif %}{{ p.name }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+              {% if not lineup_locked %}<div><button type="submit" class="btn btn--primary">{{ t('matches.lineup_save') }}</button></div>{% endif %}
+            </form>
+          {% else %}
+            <p class="muted">{{ t('matches.lineup_empty') }}</p>
+          {% endif %}
+
+          {% if not lineup_locked %}
+            <details class="disclosure"{% if not side.players %} open{% endif %}>
+              <summary>{{ t('matches.quick_add') }}</summary>
+              <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/players') }}" class="stack">
+                {{ csrf_field() }}
+                <input type="hidden" name="team" value="{{ side.team_id }}">
+                {{ m.textarea('list', t('players.list'), '', {}, {rows: 5, placeholder: t('players.list_placeholder'), help: t('matches.quick_add_help'), id: 'list-' ~ side.team_id}) }}
+                <div><button type="submit" class="btn btn--secondary">{{ t('players.add') }}</button></div>
+              </form>
+            </details>
+          {% endif %}
+        </section>
+      {% endfor %}
+    </div>
+
+    <aside class="stack-lg">
+      <section class="control" aria-labelledby="control-title">
+        <div class="control__status">
+          {{ m.status_badge(match.status) }}
+          <h2 class="visually-hidden" id="control-title">{{ t('matches.voting') }}</h2>
+        </div>
+        <p class="control__big">{{ m.ballots(match.ballot_count) }}</p>
+        {% if match.status == 'open' %}
+          <p class="control__sub">{{ match.closes_at ? t('matches.closes_at', {time: match.closes_at|time}) : t('matches.opened_at', {time: match.opened_at|time}) }}</p>
+        {% elseif match.status == 'closed' and match.closed_at %}
+          <p class="control__sub">{{ t('matches.closed_at', {time: match.closed_at|datetime}) }}</p>
+        {% endif %}
+
+        <div class="control__actions">
+          {% if match.status == 'open' %}
+            <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/close') }}" data-confirm="{{ t('matches.close_confirm') }}">
+              {{ csrf_field() }}
+              <button type="submit" class="btn btn--stop btn--big btn--block">{{ t('matches.close') }}</button>
+            </form>
+          {% elseif other_open %}
+            <p class="muted small">{{ t('matches.other_open_hint', {match: other_open.home_name ~ ' – ' ~ other_open.away_name}) }}</p>
+          {% else %}
+            <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/open') }}" data-confirm="{{ t('matches.open_confirm') }}">
+              {{ csrf_field() }}
+              <button type="submit" class="btn btn--gold btn--big btn--block">{{ m.crown('icon') }}{{ match.status == 'closed' ? t('matches.reopen') : t('matches.open') }}</button>
+            </form>
+          {% endif %}
+          <a href="{{ url('/admin/matches/' ~ match.id ~ '/results') }}" class="btn btn--secondary">{{ t('matches.results') }}</a>
+          <a href="{{ url('/admin/matches/' ~ match.id ~ '/present') }}" class="btn btn--secondary">{{ t('matches.present') }}</a>
+        </div>
+      </section>
+
+      <section class="card stack-sm">
+        <h2 class="h3">{{ t('matches.results_public') }}</h2>
+        <p class="muted small">{{ t('matches.results_public_help') }}</p>
+        <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/visibility') }}" class="row row--between">
+          {{ csrf_field() }}
+          <span class="badge {{ match.results_public ? 'badge--open' : 'badge--muted' }}">{{ match.results_public ? t('matches.results_public_on') : t('matches.results_public_off') }}</span>
+          <input type="hidden" name="public" value="{{ match.results_public ? '0' : '1' }}">
+          <button type="submit" class="btn btn--secondary btn--small">{{ match.results_public ? t('matches.hide_results') : t('matches.share_results') }}</button>
+        </form>
+      </section>
+
+      <section class="card stack-sm">
+        <h2 class="h3">{{ t('matches.link') }}</h2>
+        <img src="{{ qr }}" alt="QR-Code: {{ vote_url }}" class="qr">
+        <div class="copy-field">
+          <input id="vote-url" type="text" value="{{ vote_url }}" readonly>
+          <button type="button" class="btn btn--secondary btn--small" data-copy-target="vote-url" data-copied="{{ t('matches.copied') }}">{{ t('matches.copy') }}</button>
+        </div>
+        <p class="muted small">{{ t('matches.link_help') }}</p>
+        <a href="{{ url('/admin/poster') }}" class="btn btn--secondary btn--small">{{ t('matches.poster') }}</a>
+      </section>
+
+      <section class="card stack-sm dangerzone">
+        <h2 class="h3">{{ t('matches.danger') }}</h2>
+        <div class="row">
+          {% if match.ballot_count > 0 %}
+            <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/reset') }}" data-confirm="{{ t('matches.reset_confirm') }}">
+              {{ csrf_field() }}
+              <button type="submit" class="btn btn--danger btn--small">{{ t('matches.reset') }}</button>
+            </form>
+          {% endif %}
+          <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/delete') }}" data-confirm="{{ t('matches.delete_confirm') }}">
+            {{ csrf_field() }}
+            <button type="submit" class="btn btn--danger btn--small">{{ t('matches.delete') }}</button>
+          </form>
+        </div>
+      </section>
+    </aside>
+  </div>
+{% endblock %}

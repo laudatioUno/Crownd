@@ -1,0 +1,15 @@
+{% extends 'layout/admin.html.twig' %}
+
+{% block title %}{{ t('teams.new') }}{% endblock %}
+
+{% block content %}
+  <div>
+    <p class="breadcrumb"><a href="{{ url('/admin/teams') }}">← {{ t('teams.title') }}</a></p>
+    <h1 class="h1">{{ t('teams.new') }}</h1>
+  </div>
+  <form method="post" action="{{ url('/admin/teams/new') }}" enctype="multipart/form-data" class="card stack" novalidate>
+    {{ csrf_field() }}
+    {% include 'admin/teams/_team_fields.html.twig' %}
+    <div><button type="submit" class="btn btn--primary">{{ t('teams.new') }}</button></div>
+  </form>
+{% endblock %}

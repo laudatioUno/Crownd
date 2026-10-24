@@ -1,0 +1,31 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('results.title') }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <p class="breadcrumb"><a href="{{ url('/admin/matches/' ~ match.id) }}">← {{ m.matchup_names(match) }}</a></p>
+      <h1 class="h1">{{ t('results.title') }}</h1>
+      <p class="lead">{{ m.match_meta(match) }}</p>
+    </div>
+    <div class="row">
+      {% if match.status == 'open' %}
+        <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/close') }}" data-confirm="{{ t('matches.close_confirm') }}">
+          {{ csrf_field() }}<input type="hidden" name="back" value="results">
+          <button type="submit" class="btn btn--stop">{{ t('matches.close') }}</button>
+        </form>
+      {% endif %}
+      <form method="post" action="{{ url('/admin/matches/' ~ match.id ~ '/visibility') }}">
+        {{ csrf_field() }}<input type="hidden" name="back" value="results">
+        <input type="hidden" name="public" value="{{ match.results_public ? '0' : '1' }}">
+        <button type="submit" class="btn btn--secondary">{{ match.results_public ? t('matches.hide_results') : t('matches.share_results') }}</button>
+      </form>
+      <a href="{{ url('/admin/matches/' ~ match.id ~ '/present') }}" class="btn btn--gold">{{ t('matches.present') }}</a>
+    </div>
+  </div>
+  <div data-live-url="{{ url(live_url) }}">
+    {% include 'partials/results.html.twig' %}
+  </div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('players.edit') }}{% endblock %}
+
+{% block content %}
+  <div>
+    <p class="breadcrumb"><a href="{{ url('/admin/teams/' ~ team.id ~ '#players') }}">← {{ team.name }}</a></p>
+    <h1 class="h1">{{ t('players.edit') }}</h1>
+  </div>
+  <form method="post" action="{{ url('/admin/players/' ~ player.id) }}" enctype="multipart/form-data" class="card stack" novalidate>
+    {{ csrf_field() }}
+    <div class="row">
+      {{ m.avatar(player, 'xl', team.id) }}
+      <div class="stack-sm">
+        {{ m.field('photo', t('players.photo'), '', errors, 'file', {optional: true, accept: 'image/png,image/jpeg,image/webp', help: t('players.photo_help')}) }}
+        {% if player.photo_file %}<label class="check"><input type="checkbox" name="remove_photo" value="1"> {{ t('players.remove_photo') }}</label>{% endif %}
+      </div>
+    </div>
+    <div class="grid-2">
+      {{ m.field('name', t('players.name'), values.name, errors, 'text', {required: true, maxlength: 100, help: t('players.name_help')}) }}
+      {{ m.field('number', t('players.number_long'), values.number, errors, 'text', {optional: true, inputmode: 'numeric', maxlength: 4}) }}
+    </div>
+    {{ m.field('position', t('players.position'), values.position, errors, 'text', {optional: true, maxlength: 40, help: t('players.position_help')}) }}
+    {% if squads %}
+      <fieldset class="fieldset stack-sm">
+        <legend class="label">{{ t('players.squads') }}</legend>
+        <div class="row">{% for s in squads %}<label class="check"><input type="checkbox" name="squads[]" value="{{ s.id }}"{{ s.id in member_of ? ' checked' }}> {{ s.name }}</label>{% endfor %}</div>
+      </fieldset>
+    {% endif %}
+    <label class="check"><input type="checkbox" name="archived" value="1"{{ player.archived ? ' checked' }}> <span>{{ t('players.archived') }}<br><span class="muted small">{{ t('players.archived_help') }}</span></span></label>
+    <div class="row">
+      <button type="submit" class="btn btn--primary">{{ t('app.save') }}</button>
+      <a href="{{ url('/admin/teams/' ~ team.id ~ '#players') }}" class="btn btn--secondary">{{ t('app.cancel') }}</a>
+    </div>
+  </form>
+  <form method="post" action="{{ url('/admin/players/' ~ player.id ~ '/delete') }}" data-confirm="{{ t('players.delete_confirm') }}">
+    {{ csrf_field() }}
+    <button type="submit" class="btn btn--danger btn--small">{{ t('app.delete') }}</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'layout/public.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('vote.title', {award: brand.award_label}) }}{% endblock %}
+
+{% block content %}
+  <div class="hero">
+    <span class="hero__kicker">{{ m.crown('crown') }}{{ brand.award_label }}</span>
+    <h1 class="hero__title">{{ t('vote.title', {award: brand.award_label}) }}</h1>
+    <p class="hero__text">{{ t('vote.intro') }}</p>
+  </div>
+
+  {% include 'partials/matchup.html.twig' %}
+
+  {% if error %}<div class="notice notice--error" role="alert">{{ t(error) }}</div>{% endif %}
+
+  <form method="post" action="{{ url('/vote') }}" data-ballot>
+    {{ csrf_field() }}
+    <input type="hidden" name="match" value="{{ match.id }}">
+    <div class="visually-hidden" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+    {% for side in ['home', 'away'] %}
+      {% set team_id = attribute(match, side ~ '_team_id') %}
+      {% set team_name = attribute(match, side ~ '_name') %}
+      {% set players = lineups[team_id] ?? [] %}
+      {% if players %}
+        <fieldset class="ballot-team fieldset" data-team-group>
+          <legend class="ballot-team__head">
+            {{ m.team_logo(attribute(match, side ~ '_logo'), team_name, team_id, 'sm') }}
+            <span class="ballot-team__title"><small>{{ t('vote.pick_for', {award: brand.award_label}) }}</small>{{ team_name }}</span>
+          </legend>
+          <div class="pick-grid">
+            {% for p in players %}
+              <label class="pick">
+                <input type="radio" name="pick_{{ team_id }}" value="{{ p.id }}"{{ (picks[team_id] ?? 0) == p.id ? ' checked' }}>
+                <span class="pick__card">
+                  <span class="pick__check" aria-hidden="true">✓</span>
+                  {{ m.avatar(p, '', team_id) }}
+                  <span class="pick__name">{{ p.name }}</span>
+                  {% if p.number is not null or p.position %}
+                    <span class="pick__meta">{% if p.number is not null %}#{{ p.number }}{% endif %}{% if p.number is not null and p.position %} · {% endif %}{{ p.position }}</span>
+                  {% endif %}
+                </span>
+              </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+      {% endif %}
+    {% endfor %}
+
+    <div class="vote-bar">
+      <div class="vote-bar__inner">
+        <p class="vote-bar__status" data-ballot-status data-template="{n} / {total} {{ t('vote.selected') }} · {{ t('vote.hint_one_vote') }}">{{ t('vote.hint_one_vote') }}</p>
+        <button type="submit" class="btn btn--gold btn--big btn--block">{{ m.crown('icon') }}{{ t('vote.submit') }}</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

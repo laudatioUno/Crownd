@@ -1,0 +1,32 @@
+{% extends 'layout/base.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block body_class %}page-admin{% endblock %}
+
+{% block body %}
+<a class="skip-link" href="#main">{{ t('app.skip_to_content') }}</a>
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__brand" href="{{ url('/admin') }}">{{ m.crown('crown') }}<span>{{ brand.club_name }}</span></a>
+    <nav class="topbar__nav" aria-label="{{ t('app.main_navigation') }}">
+      {{ m.nav_link('/admin', t('app.nav.dashboard'), current_path) }}
+      {{ m.nav_link('/admin/matches', t('app.nav.matches'), current_path) }}
+      {{ m.nav_link('/admin/teams', t('app.nav.teams'), current_path) }}
+      {{ m.nav_link('/admin/settings', t('app.nav.settings'), current_path) }}
+      {{ m.nav_link('/admin/users', t('app.nav.users'), current_path) }}
+      <a href="{{ url('/') }}" class="topbar__link">{{ t('app.nav.public') }} ↗</a>
+    </nav>
+    <div class="topbar__account">
+      <a href="{{ url('/admin/account') }}" class="topbar__link{{ current_path == '/admin/account' ? ' is-active' }}">{{ current_user.display_name }}</a>
+      <form method="post" action="{{ url('/admin/logout') }}">
+        {{ csrf_field() }}
+        <button type="submit" class="topbar__logout">{{ t('app.nav.logout') }}</button>
+      </form>
+    </div>
+  </div>
+</header>
+<main class="admin-main" id="main">
+  {% if flashes %}<div>{{ m.flashes(flashes) }}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+{% endblock %}

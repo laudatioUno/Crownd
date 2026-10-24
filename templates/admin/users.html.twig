@@ -1,0 +1,59 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('users.title') }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1 class="h1">{{ t('users.title') }}</h1>
+      <p class="lead">{{ t('users.intro') }}</p>
+    </div>
+  </div>
+  <div class="layout-2">
+    <section class="card table-wrap">
+      <table class="table">
+        <thead><tr><th>{{ t('users.display_name') }}</th><th>{{ t('users.username') }}</th><th>{{ t('users.last_login') }}</th><th><span class="visually-hidden">{{ t('users.status') }}</span></th></tr></thead>
+        <tbody>
+        {% for u in users %}
+          <tr>
+            <td><strong>{{ u.display_name }}</strong>{% if u.id == current_user.id %} <span class="badge">{{ t('users.you') }}</span>{% endif %}{% if not u.active %} <span class="badge badge--muted">{{ t('users.inactive') }}</span>{% endif %}</td>
+            <td>{{ u.username }}</td>
+            <td class="small">{{ u.last_login_at ? u.last_login_at|datetime : t('users.never') }}</td>
+            <td>
+              {% if u.id != current_user.id %}
+                <div class="row">
+                  <form method="post" action="{{ url('/admin/users/' ~ u.id ~ '/toggle') }}">
+                    {{ csrf_field() }}
+                    <button type="submit" class="link-btn{{ u.active ? ' link-btn--danger' }}">{{ u.active ? t('users.deactivate') : t('users.activate') }}</button>
+                  </form>
+                  <details class="disclosure small">
+                    <summary>{{ t('users.reset_password') }}</summary>
+                    <form method="post" action="{{ url('/admin/users/' ~ u.id ~ '/password') }}" class="row">
+                      {{ csrf_field() }}
+                      <label class="visually-hidden" for="pw-{{ u.id }}">{{ t('auth.new_password') }}</label>
+                      <div class="field"><input id="pw-{{ u.id }}" type="text" name="password" minlength="10" autocomplete="off" required></div>
+                      <button type="submit" class="btn btn--secondary btn--small">{{ t('app.save') }}</button>
+                    </form>
+                  </details>
+                </div>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    <section class="card">
+      <form method="post" action="{{ url('/admin/users') }}" class="stack" novalidate>
+        {{ csrf_field() }}
+        <h2 class="h2">{{ t('users.add') }}</h2>
+        {{ m.field('display_name', t('users.display_name'), input.display_name, errors, 'text', {required: true}) }}
+        {{ m.field('username', t('users.username'), input.username, errors, 'text', {required: true, autocomplete: 'off', help: t('validation.username')}) }}
+        {{ m.field('password', t('auth.password'), '', errors, 'password', {required: true, autocomplete: 'new-password', help: t('auth.password_help')}) }}
+        {{ m.field('password_confirm', t('auth.password_confirm'), '', errors, 'password', {required: true, autocomplete: 'new-password'}) }}
+        <button type="submit" class="btn btn--primary">{{ t('users.create') }}</button>
+      </form>
+    </section>
+  </div>
+{% endblock %}

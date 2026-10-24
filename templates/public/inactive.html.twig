@@ -1,0 +1,43 @@
+{% extends 'layout/public.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ brand.award_label }}{% endblock %}
+{% block main_class %} pub-main--plain{% endblock %}
+
+{% block content %}
+  <div class="waiting"{% if not current_user %} data-auto-reload{% endif %}>
+    {{ m.crown('crown crown--big') }}
+    <h1 class="waiting__title">{{ t('vote.inactive_title') }}</h1>
+    <p class="waiting__text">{{ brand.inactive_text ?: t('vote.inactive_text') }}</p>
+  </div>
+
+  {% if upcoming %}
+    <h2 class="visually-hidden">{{ t('vote.next_match') }}</h2>
+    {% include 'partials/matchup.html.twig' with {match: upcoming} %}
+  {% endif %}
+
+  {% if current_user %}
+    <div class="admin-box stack-sm">
+      <p class="muted">{{ t('vote.admin_start') }}</p>
+      {% if upcoming %}
+        <form method="post" action="{{ url('/admin/matches/' ~ upcoming.id ~ '/open') }}" data-confirm="{{ t('matches.open_confirm') }}">
+          {{ csrf_field() }}
+          <input type="hidden" name="back" value="home">
+          <button type="submit" class="btn btn--gold btn--big btn--block">{{ m.crown('icon') }}{{ t('vote.admin_start_button') }}</button>
+        </form>
+        <p><a href="{{ url('/admin/matches/' ~ upcoming.id) }}">{{ t('vote.admin_manage') }}</a></p>
+      {% else %}
+        <p>{{ t('vote.admin_no_match') }}</p>
+        <a href="{{ url('/admin/matches/new') }}" class="btn btn--primary">{{ t('vote.admin_create_match') }}</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if last %}
+    <section class="stack" aria-labelledby="last-title">
+      <h2 class="h2" id="last-title">{{ t('vote.last_results', {award: brand.award_label}) }}</h2>
+      <p class="muted">{{ m.matchup_names(last) }}{% set meta = m.match_meta(last)|trim %}{% if meta %} · {{ meta }}{% endif %}</p>
+      {% include 'partials/results.html.twig' with {match: last, results: last_results} %}
+    </section>
+  {% endif %}
+{% endblock %}

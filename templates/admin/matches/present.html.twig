@@ -1,0 +1,20 @@
+{% extends 'layout/base.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ brand.award_label }}{% endblock %}
+{% block body_class %}page-present{% endblock %}
+
+{% block body %}
+<main class="present">
+  <div class="present__head">
+    <h1 class="present__title">{{ m.crown('crown') }}{{ brand.award_label }}</h1>
+    <div class="present__tools">
+      <button type="button" class="btn btn--secondary btn--small" data-fullscreen>{{ t('results.fullscreen') }}</button>
+      <a href="{{ url('/admin/matches/' ~ match.id ~ '/results') }}" class="btn btn--secondary btn--small">{{ t('app.back') }}</a>
+    </div>
+  </div>
+  <div data-live-url="{{ url(live_url) }}">
+    {% include 'partials/results.html.twig' %}
+  </div>
+</main>
+{% endblock %}

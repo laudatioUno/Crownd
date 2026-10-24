@@ -1,0 +1,18 @@
+{% import 'partials/macros.html.twig' as m %}
+{{ m.field('name', t('teams.name'), values.name, errors, 'text', {required: true, maxlength: 100, help: t('teams.name_help'), id: 'f-team_name'}) }}
+{{ m.field('short_name', t('teams.short_name'), values.short_name, errors, 'text', {optional: true, maxlength: 20, help: t('teams.short_name_help')}) }}
+<div class="row">
+  {% if team and team.logo_file %}<img src="{{ media(team.logo_file) }}" alt="" class="logo logo--lg">{% endif %}
+  <div class="stack-sm">
+    {{ m.field('logo', t('teams.logo'), '', errors, 'file', {optional: true, accept: 'image/png,image/jpeg,image/webp', help: t('upload.help')}) }}
+    {% if team and team.logo_file %}<label class="check"><input type="checkbox" name="remove_logo" value="1"> {{ t('teams.remove_logo') }}</label>{% endif %}
+  </div>
+</div>
+<div class="stack-sm">
+  <label class="check"><input type="checkbox" id="f-use_color" name="use_color" value="1"{{ values.color ? ' checked' }}> {{ t('teams.use_color') }}</label>
+  <div class="field{{ errors.color is defined ? ' field--error' }}" data-color-row>
+    <label for="f-color">{{ t('teams.color') }}</label>
+    <div class="input-color"><input type="color" id="f-color" name="color" value="{{ values.color ?: '#0B5FA8' }}"></div>
+    <p class="field__help">{{ t('teams.color_help') }}</p>
+  </div>
+</div>

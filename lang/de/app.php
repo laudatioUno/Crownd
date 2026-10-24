@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'name' => 'Crownd',
+    'skip_to_content' => 'Zum Inhalt springen',
+    'main_navigation' => 'Hauptnavigation',
+    'optional' => '(optional)',
+    'save' => 'Speichern',
+    'cancel' => 'Abbrechen',
+    'back' => 'Zurück',
+    'edit' => 'Bearbeiten',
+    'delete' => 'Löschen',
+    'none' => '–',
+    'vs' => 'vs',
+    'nav.dashboard' => 'Übersicht',
+    'nav.matches' => 'Spiele',
+    'nav.teams' => 'Mannschaften',
+    'nav.settings' => 'Einstellungen',
+    'nav.users' => 'Admins',
+    'nav.account' => 'Mein Konto',
+    'nav.public' => 'Abstimmungsseite',
+    'nav.logout' => 'Abmelden',
+    'nav.menu' => 'Menü',
+    'powered_by' => 'Abstimmung mit Crownd',
+    'privacy' => 'Datenschutz',
+    'admin_login' => 'Admin',
+];

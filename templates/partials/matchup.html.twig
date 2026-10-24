@@ -1,0 +1,14 @@
+{% import 'partials/macros.html.twig' as m %}
+<div class="matchup">
+  <div class="matchup__team">
+    {{ m.team_logo(match.home_logo, match.home_name, match.home_team_id, 'lg') }}
+    <span class="matchup__name">{{ match.home_name }}</span>
+  </div>
+  <span class="matchup__vs">{{ t('app.vs') }}</span>
+  <div class="matchup__team">
+    {{ m.team_logo(match.away_logo, match.away_name, match.away_team_id, 'lg') }}
+    <span class="matchup__name">{{ match.away_name }}</span>
+  </div>
+  {% set meta = m.match_meta(match)|trim %}
+  {% if meta %}<p class="matchup__meta">{{ meta }}</p>{% endif %}
+</div>

@@ -1,0 +1,63 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ match ? t('matches.edit') : t('matches.new') }}{% endblock %}
+
+{% block content %}
+  <div>
+    <p class="breadcrumb">
+      {% if match %}<a href="{{ url('/admin/matches/' ~ match.id) }}">← {{ m.matchup_names(match) }}</a>{% else %}<a href="{{ url('/admin/matches') }}">← {{ t('matches.title') }}</a>{% endif %}
+    </p>
+    <h1 class="h1">{{ match ? t('matches.edit') : t('matches.new') }}</h1>
+  </div>
+
+  {% if not match and teams|length < 2 %}
+    <div class="notice notice--warning">{{ t('matches.empty_teams') }} <a href="{{ url('/admin/teams/new') }}">{{ t('teams.new') }}</a></div>
+  {% endif %}
+
+  <form method="post" action="{{ url(match ? '/admin/matches/' ~ match.id ~ '/edit' : '/admin/matches/new') }}" class="card stack-lg" novalidate>
+    {{ csrf_field() }}
+    {% if match %}
+      <p class="muted">{{ m.matchup_names(match) }} – {{ t('matches.teams_fixed') }}</p>
+    {% else %}
+      <div class="grid-2">
+        {% for side in ['home', 'away'] %}
+          <div class="stack">
+            {% set field = side ~ '_team_id' %}
+            <div class="field{{ errors[field] is defined ? ' field--error' }}">
+              <label for="f-{{ field }}">{{ t('matches.' ~ side ~ '_team') }}</label>
+              <select id="f-{{ field }}" name="{{ field }}" required>
+                <option value="">{{ t('matches.choose_team') }}</option>
+                {% for team in teams %}<option value="{{ team.id }}"{{ values[field] == team.id ~ '' ? ' selected' }}>{{ team.name }}</option>{% endfor %}
+              </select>
+              {% if errors[field] is defined %}<p class="field__error">{{ t(errors[field]) }}</p>{% endif %}
+            </div>
+            {% set sfield = side ~ '_squad_id' %}
+            <div class="field">
+              <label for="f-{{ sfield }}">{{ t('matches.squad') }}</label>
+              <select id="f-{{ sfield }}" name="{{ sfield }}" data-squad-for="f-{{ field }}">
+                <option value="">{{ t('matches.squad_none') }}</option>
+                {% for s in squads %}<option value="{{ s.id }}" data-team="{{ s.team_id }}"{{ values[sfield] == s.id ~ '' ? ' selected' }}>{{ s.team_name }} – {{ s.name }}</option>{% endfor %}
+              </select>
+              <p class="field__help">{{ t('matches.squad_help') }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="grid-2">
+      {{ m.field('competition', t('matches.competition'), values.competition, errors, 'text', {optional: true, maxlength: 100, list: 'competitions', help: t('matches.competition_help')}) }}
+      {{ m.field('kickoff_at', t('matches.kickoff'), values.kickoff_at, errors, 'datetime-local', {optional: true}) }}
+    </div>
+    <datalist id="competitions">{% for c in competitions %}<option value="{{ c }}">{% endfor %}</datalist>
+    <div class="grid-2">
+      {{ m.field('venue', t('matches.venue'), values.venue, errors, 'text', {optional: true, maxlength: 100}) }}
+      {{ m.field('auto_close_minutes', t('matches.auto_close') ~ ' (' ~ t('matches.minutes') ~ ')', values.auto_close_minutes, errors, 'number', {optional: true, min: 1, max: 600, inputmode: 'numeric', help: t('matches.auto_close_help')}) }}
+    </div>
+    <div class="row">
+      <button type="submit" class="btn btn--primary btn--big">{{ match ? t('app.save') : t('matches.create') }}</button>
+      <a href="{{ url(match ? '/admin/matches/' ~ match.id : '/admin/matches') }}" class="btn btn--secondary">{{ t('app.cancel') }}</a>
+    </div>
+  </form>
+{% endblock %}

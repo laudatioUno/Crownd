@@ -1,0 +1,18 @@
+{% extends 'layout/base.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block body_class %}page-auth{% endblock %}
+
+{% block body %}
+<div class="auth">
+  <header class="auth__brand">
+    {% if brand.logo %}<img src="{{ media(brand.logo) }}" alt="" class="auth__logo">{% else %}{{ m.crown('crown') }}{% endif %}
+    <span>{{ brand.club_name }}</span>
+  </header>
+  <main class="card stack" id="main">
+    {{ m.flashes(flashes) }}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="auth__footer">Crownd {{ version }}</footer>
+</div>
+{% endblock %}

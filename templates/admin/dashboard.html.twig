@@ -1,0 +1,88 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('dashboard.title') }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1 class="h1">{{ t('dashboard.title') }}</h1>
+    </div>
+    <a href="{{ url('/admin/matches/new') }}" class="btn btn--primary">{{ t('matches.new') }}</a>
+  </div>
+
+  <div class="layout-2">
+    <div class="stack">
+      {% set focus = open ?? upcoming %}
+      {% if focus %}
+        <section class="control" aria-labelledby="focus-title">
+          <div class="control__status">
+            {{ m.status_badge(focus.status) }}
+            {% if not open %}<span class="muted">{{ t('dashboard.next') }}</span>{% endif %}
+          </div>
+          <h2 class="h2" id="focus-title">{{ m.matchup_names(focus) }}</h2>
+          {% set meta = m.match_meta(focus)|trim %}{% if meta %}<p class="control__sub">{{ meta }}</p>{% endif %}
+          {% if open %}
+            <p class="control__big">{{ m.ballots(open.ballot_count) }}</p>
+            {% if open.closes_at %}<p class="control__sub">{{ t('matches.closes_at', {time: open.closes_at|time}) }}</p>{% else %}<p class="control__sub">{{ t('matches.opened_at', {time: open.opened_at|time}) }}</p>{% endif %}
+          {% endif %}
+          <div class="control__actions">
+            {% if open %}
+              <a href="{{ url('/admin/matches/' ~ open.id ~ '/results') }}" class="btn btn--gold btn--big">{{ t('matches.results') }}</a>
+              <form method="post" action="{{ url('/admin/matches/' ~ open.id ~ '/close') }}" data-confirm="{{ t('matches.close_confirm') }}">
+                {{ csrf_field() }}
+                <button type="submit" class="btn btn--stop btn--big btn--block">{{ t('matches.close') }}</button>
+              </form>
+            {% else %}
+              <form method="post" action="{{ url('/admin/matches/' ~ focus.id ~ '/open') }}" data-confirm="{{ t('matches.open_confirm') }}">
+                {{ csrf_field() }}
+                <button type="submit" class="btn btn--gold btn--big btn--block">{{ m.crown('icon') }}{{ t('matches.open') }}</button>
+              </form>
+            {% endif %}
+            <a href="{{ url('/admin/matches/' ~ focus.id) }}" class="btn btn--secondary">{{ t('dashboard.manage') }}</a>
+          </div>
+        </section>
+      {% else %}
+        <section class="card stack">
+          <h2 class="h2">{{ t('dashboard.getting_started') }}</h2>
+          <ol class="checklist">
+            <li><a href="{{ url('/admin/teams') }}">{{ t('dashboard.step_teams') }}</a></li>
+            <li>{{ t('dashboard.step_players') }}</li>
+            <li><a href="{{ url('/admin/matches/new') }}">{{ t('dashboard.step_match') }}</a></li>
+            <li><a href="{{ url('/admin/poster') }}">{{ t('dashboard.step_poster') }}</a></li>
+          </ol>
+        </section>
+      {% endif %}
+
+      {% if last %}
+        <section class="card stack-sm">
+          <div class="row row--between">
+            <h2 class="h3">{{ t('dashboard.last') }}</h2>
+            {{ m.status_badge(last.status) }}
+          </div>
+          <p><strong>{{ m.matchup_names(last) }}</strong></p>
+          <p class="muted small">{{ m.match_meta(last) }} · {{ m.ballots(last.ballot_count) }}</p>
+          <p><a href="{{ url('/admin/matches/' ~ last.id ~ '/results') }}" class="btn btn--secondary btn--small">{{ t('matches.results') }}</a></p>
+        </section>
+      {% endif %}
+    </div>
+
+    <aside class="card stack">
+      <h2 class="h3">{{ t('matches.link') }}</h2>
+      <div class="copy-field">
+        <input id="vote-url" type="text" value="{{ vote_url|trim('/', 'right') }}" readonly>
+        <button type="button" class="btn btn--secondary btn--small" data-copy-target="vote-url" data-copied="{{ t('matches.copied') }}">{{ t('matches.copy') }}</button>
+      </div>
+      <p class="muted small">{{ t('matches.link_help') }}</p>
+      <a href="{{ url('/admin/poster') }}" class="btn btn--secondary">{{ t('matches.poster') }}</a>
+      <hr>
+      <h2 class="h3">{{ t('matches.checklist') }}</h2>
+      <ol class="checklist small">
+        <li>{{ t('matches.checklist_1') }}</li>
+        <li>{{ t('matches.checklist_2') }}</li>
+        <li>{{ t('matches.checklist_3') }}</li>
+        <li>{{ t('matches.checklist_4') }}</li>
+      </ol>
+    </aside>
+  </div>
+{% endblock %}

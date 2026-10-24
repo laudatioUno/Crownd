@@ -1,0 +1,24 @@
+{% extends 'layout/base.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block body_class %}page-public{% endblock %}
+
+{% block body %}
+<header class="pub-head">
+  <div class="pub-head__inner">
+    {% if brand.logo %}<img src="{{ media(brand.logo) }}" alt="" class="pub-head__logo">{% endif %}
+    <span class="pub-head__club">{{ brand.club_name }}</span>
+  </div>
+</header>
+<main class="pub-main{% block main_class %}{% endblock %}" id="main">
+  {{ m.flashes(flashes) }}
+  {% block content %}{% endblock %}
+</main>
+<footer class="pub-foot">
+  <p class="pub-foot__links">
+    <span>{{ t('app.powered_by') }}</span>
+    {% if brand.privacy_url %}<a href="{{ brand.privacy_url }}" rel="noopener">{{ t('app.privacy') }}</a>{% endif %}
+    <a href="{{ url('/admin') }}">{{ t('app.admin_login') }}</a>
+  </p>
+</footer>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('settings.title') }}{% endblock %}
+
+{% block content %}
+  <h1 class="h1">{{ t('settings.title') }}</h1>
+  <form method="post" action="{{ url('/admin/settings') }}" enctype="multipart/form-data" class="stack-lg" novalidate>
+    {{ csrf_field() }}
+    <section class="card stack">
+      <h2 class="h2">{{ t('settings.club') }}</h2>
+      {{ m.field('club_name', t('settings.club_name'), values.club_name, errors, 'text', {required: true, maxlength: 100}) }}
+      <div class="row">
+        {% if values.logo_file ?? '' %}<img src="{{ media(values.logo_file) }}" alt="" class="logo logo--lg">{% endif %}
+        <div class="stack-sm">
+          {{ m.field('logo', t('settings.logo'), '', errors, 'file', {optional: true, accept: 'image/png,image/jpeg,image/webp', help: t('settings.logo_help')}) }}
+          {% if values.logo_file ?? '' %}<label class="check"><input type="checkbox" name="remove_logo" value="1"> {{ t('settings.remove_logo') }}</label>{% endif %}
+        </div>
+      </div>
+      <div class="field{{ errors.primary_color is defined ? ' field--error' }}">
+        <label for="f-primary_color">{{ t('settings.color') }}</label>
+        <div class="input-color">
+          <input type="color" id="f-primary_color" name="primary_color" value="{{ values.primary_color }}">
+          <span class="color-sample" data-color-sample>{{ t('settings.color_sample') }}</span>
+        </div>
+        <p class="field__help">{{ t('settings.color_help') }}</p>
+      </div>
+    </section>
+
+    <section class="card stack">
+      <h2 class="h2">{{ t('settings.voting') }}</h2>
+      {{ m.field('award_label', t('settings.award_label'), values.award_label, errors, 'text', {required: true, maxlength: 40, help: t('settings.award_label_help')}) }}
+      {{ m.textarea('inactive_text', t('settings.inactive_text'), values.inactive_text, errors, {optional: true, maxlength: 500, help: t('settings.inactive_text_help')}) }}
+      {{ m.textarea('thanks_text', t('settings.thanks_text'), values.thanks_text, errors, {optional: true, maxlength: 500}) }}
+      {{ m.field('privacy_url', t('settings.privacy_url'), values.privacy_url, errors, 'url', {optional: true, help: t('settings.privacy_url_help')}) }}
+    </section>
+
+    <button type="submit" class="btn btn--primary btn--big">{{ t('app.save') }}</button>
+  </form>
+{% endblock %}
