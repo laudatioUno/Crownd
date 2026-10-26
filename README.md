@@ -95,7 +95,17 @@ bin/build-release.sh                                # builds build/crownd-<versi
 | `lang/` | Texts (German) |
 | `migrations/` | Database schema |
 
-Releases: GitHub › Actions › **Release** › «Run workflow» with the version from `src/App.php`.
+### Releases
+
+Releases are created automatically when a new version reaches `main`:
+
+1. In the pull request, raise `App::VERSION` in `src/App.php` (e.g. `1.1.0`, or `1.1.0-beta.1` for a pre-release).
+2. Add a section `## [1.1.0] – YYYY-MM` to [CHANGELOG.md](CHANGELOG.md); it becomes the release notes.
+3. Merge the pull request. The *Release* workflow runs the tests, builds `crownd-1.1.0.zip`, creates the tag `v1.1.0` and publishes the release with the ZIP.
+
+Merges that do not change the version create no release. A failed release can be retried under Actions › Release › «Run workflow».
+
+Every pull request also builds a test ZIP (`crownd-<version>-pr<n>.zip`) under Checks › CI › Artifacts, to try it on a server before merging.
 
 ## License
 

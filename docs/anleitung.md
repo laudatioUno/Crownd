@@ -33,3 +33,11 @@ Crownd ersetzt den bisherigen Redirect auf `/mvp`. Der Link (und damit ein berei
 - Ein Testlauf vor dem Spiel? Abstimmung starten, abstimmen, beenden und unter *Weitere Aktionen* «Alle Stimmen löschen». Danach lässt sie sich wieder starten.
 - Versehentlich beendet? «Wieder öffnen» startet die Abstimmung erneut, die bisherigen Stimmen bleiben.
 - Update: neues ZIP hochladen, dabei `config/config.php` und `storage/uploads/` behalten.
+
+## Neue Version veröffentlichen
+
+1. Im Pull Request die Version in `src/App.php` erhöhen (`VERSION = '1.1.0'`).
+2. In `CHANGELOG.md` einen Abschnitt `## [1.1.0] – 2026-11` mit den Änderungen ergänzen – das werden die Release-Notes.
+3. Pull Request mergen. GitHub erstellt danach automatisch das Release `v1.1.0` mit `crownd-1.1.0.zip` (Actions › Release).
+
+Zum Testen vor dem Mergen: Im Pull Request unter *Checks* › *CI* › *Artifacts* liegt das ZIP `crownd-<version>-pr<nummer>.zip`.
