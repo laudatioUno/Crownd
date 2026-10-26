@@ -32,7 +32,7 @@ final class SettingsRepository
     {
         if ($this->cache === null) {
             $this->cache = [];
-            foreach ($this->db->all('SELECT `key`, `value`, is_encrypted FROM settings') as $row) {
+            foreach ($this->db->all('SELECT `key`, `value`, is_encrypted FROM crownd_settings') as $row) {
                 $value = $row['value'];
                 if ($value !== null && (int) $row['is_encrypted'] === 1) {
                     $value = $this->crypto->decrypt((string) $value);
@@ -48,7 +48,7 @@ final class SettingsRepository
     {
         $stored = ($value !== null && $encrypt) ? $this->crypto->encrypt($value) : $value;
         $this->db->run(
-            'INSERT INTO settings (`key`, `value`, is_encrypted, updated_at) VALUES (?, ?, ?, ?)
+            'INSERT INTO crownd_settings (`key`, `value`, is_encrypted, updated_at) VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), is_encrypted = VALUES(is_encrypted), updated_at = VALUES(updated_at)',
             [$key, $stored, $encrypt ? 1 : 0, Database::now()],
         );

@@ -26,7 +26,7 @@ final class Results
         $matchId = (int) $match['id'];
         $counts = [];
         foreach ($this->db->all(
-            'SELECT team_id, player_id, COUNT(*) AS n FROM votes WHERE match_id = ? GROUP BY team_id, player_id',
+            'SELECT team_id, player_id, COUNT(*) AS n FROM crownd_votes WHERE match_id = ? GROUP BY team_id, player_id',
             [$matchId],
         ) as $row) {
             $counts[(int) $row['team_id']][(int) $row['player_id']] = (int) $row['n'];

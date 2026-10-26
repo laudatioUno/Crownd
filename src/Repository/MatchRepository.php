@@ -18,10 +18,10 @@ final class MatchRepository
     private const SELECT = 'SELECT m.*,
             h.name AS home_name, h.short_name AS home_short, h.logo_file AS home_logo, h.color AS home_color,
             a.name AS away_name, a.short_name AS away_short, a.logo_file AS away_logo, a.color AS away_color,
-            (SELECT COUNT(*) FROM ballots b WHERE b.match_id = m.id) AS ballot_count
-        FROM matches m
-        JOIN teams h ON h.id = m.home_team_id
-        JOIN teams a ON a.id = m.away_team_id';
+            (SELECT COUNT(*) FROM crownd_ballots b WHERE b.match_id = m.id) AS ballot_count
+        FROM crownd_matches m
+        JOIN crownd_teams h ON h.id = m.home_team_id
+        JOIN crownd_teams a ON a.id = m.away_team_id';
 
     public function __construct(private readonly Database $db)
     {
@@ -80,22 +80,22 @@ final class MatchRepository
     {
         $now = Database::now();
 
-        return $this->db->insert('matches', $data + ['status' => MatchStatus::DRAFT, 'created_at' => $now, 'updated_at' => $now]);
+        return $this->db->insert('crownd_matches', $data + ['status' => MatchStatus::DRAFT, 'created_at' => $now, 'updated_at' => $now]);
     }
 
     /** @param array<string, mixed> $data */
     public function update(int $id, array $data): void
     {
-        $this->db->update('matches', $data + ['updated_at' => Database::now()], ['id' => $id]);
+        $this->db->update('crownd_matches', $data + ['updated_at' => Database::now()], ['id' => $id]);
     }
 
     public function delete(int $id): void
     {
         $this->db->transaction(function (Database $db) use ($id): void {
-            $db->run('DELETE FROM votes WHERE match_id = ?', [$id]);
-            $db->run('DELETE FROM ballots WHERE match_id = ?', [$id]);
-            $db->run('DELETE FROM match_players WHERE match_id = ?', [$id]);
-            $db->run('DELETE FROM matches WHERE id = ?', [$id]);
+            $db->run('DELETE FROM crownd_votes WHERE match_id = ?', [$id]);
+            $db->run('DELETE FROM crownd_ballots WHERE match_id = ?', [$id]);
+            $db->run('DELETE FROM crownd_match_players WHERE match_id = ?', [$id]);
+            $db->run('DELETE FROM crownd_matches WHERE id = ?', [$id]);
         });
     }
 
@@ -107,7 +107,7 @@ final class MatchRepository
     public function lineup(int $matchId, int $teamId): array
     {
         return $this->db->all(
-            'SELECT p.* FROM match_players mp JOIN players p ON p.id = mp.player_id
+            'SELECT p.* FROM crownd_match_players mp JOIN crownd_players p ON p.id = mp.player_id
              WHERE mp.match_id = ? AND mp.team_id = ?
              ORDER BY p.number IS NULL, p.number, p.name',
             [$matchId, $teamId],
@@ -130,15 +130,15 @@ final class MatchRepository
     {
         $this->db->transaction(function (Database $db) use ($matchId, $teamId, $playerIds): void {
             $db->run(
-                'DELETE mp FROM match_players mp
+                'DELETE mp FROM crownd_match_players mp
                  WHERE mp.match_id = ? AND mp.team_id = ?
-                   AND NOT EXISTS (SELECT 1 FROM votes v WHERE v.match_id = mp.match_id AND v.player_id = mp.player_id)',
+                   AND NOT EXISTS (SELECT 1 FROM crownd_votes v WHERE v.match_id = mp.match_id AND v.player_id = mp.player_id)',
                 [$matchId, $teamId],
             );
             foreach (array_unique($playerIds) as $playerId) {
                 $db->run(
-                    'INSERT IGNORE INTO match_players (match_id, team_id, player_id)
-                     SELECT ?, team_id, id FROM players WHERE id = ? AND team_id = ?',
+                    'INSERT IGNORE INTO crownd_match_players (match_id, team_id, player_id)
+                     SELECT ?, team_id, id FROM crownd_players WHERE id = ? AND team_id = ?',
                     [$matchId, $playerId, $teamId],
                 );
             }
@@ -148,7 +148,7 @@ final class MatchRepository
     public function addToLineup(int $matchId, int $teamId, int $playerId): void
     {
         $this->db->run(
-            'INSERT IGNORE INTO match_players (match_id, team_id, player_id) VALUES (?, ?, ?)',
+            'INSERT IGNORE INTO crownd_match_players (match_id, team_id, player_id) VALUES (?, ?, ?)',
             [$matchId, $teamId, $playerId],
         );
     }
@@ -156,8 +156,8 @@ final class MatchRepository
     public function deleteVotes(int $matchId): void
     {
         $this->db->transaction(function (Database $db) use ($matchId): void {
-            $db->run('DELETE FROM votes WHERE match_id = ?', [$matchId]);
-            $db->run('DELETE FROM ballots WHERE match_id = ?', [$matchId]);
+            $db->run('DELETE FROM crownd_votes WHERE match_id = ?', [$matchId]);
+            $db->run('DELETE FROM crownd_ballots WHERE match_id = ?', [$matchId]);
         });
     }
 
@@ -165,7 +165,7 @@ final class MatchRepository
     public function closeExpired(): void
     {
         $this->db->run(
-            "UPDATE matches SET status = 'closed', closed_at = closes_at, updated_at = ?
+            "UPDATE crownd_matches SET status = 'closed', closed_at = closes_at, updated_at = ?
              WHERE status = 'open' AND closes_at IS NOT NULL AND closes_at <= ?",
             [Database::now(), Database::now()],
         );

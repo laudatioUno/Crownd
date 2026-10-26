@@ -17,14 +17,14 @@ final class PlayerRepository
     /** @return array<string, mixed>|null */
     public function find(int $id): ?array
     {
-        return $this->db->one('SELECT p.* FROM players p WHERE p.id = ?', [$id]);
+        return $this->db->one('SELECT p.* FROM crownd_players p WHERE p.id = ?', [$id]);
     }
 
     /** @return list<array<string, mixed>> */
     public function forTeam(int $teamId, bool $withArchived = false): array
     {
         return $this->db->all(
-            'SELECT p.* FROM players p WHERE p.team_id = ?' . ($withArchived ? '' : ' AND p.archived = 0')
+            'SELECT p.* FROM crownd_players p WHERE p.team_id = ?' . ($withArchived ? '' : ' AND p.archived = 0')
             . ' ORDER BY p.archived, ' . self::ORDER,
             [$teamId],
         );
@@ -35,24 +35,24 @@ final class PlayerRepository
     {
         $now = Database::now();
 
-        return $this->db->insert('players', $data + ['created_at' => $now, 'updated_at' => $now]);
+        return $this->db->insert('crownd_players', $data + ['created_at' => $now, 'updated_at' => $now]);
     }
 
     /** @param array<string, mixed> $data */
     public function update(int $id, array $data): void
     {
-        $this->db->update('players', $data + ['updated_at' => Database::now()], ['id' => $id]);
+        $this->db->update('crownd_players', $data + ['updated_at' => Database::now()], ['id' => $id]);
     }
 
     /** A player who was in a line-up can only be archived, so results stay complete. */
     public function isUsed(int $id): bool
     {
-        return (bool) $this->db->value('SELECT 1 FROM match_players WHERE player_id = ? LIMIT 1', [$id]);
+        return (bool) $this->db->value('SELECT 1 FROM crownd_match_players WHERE player_id = ? LIMIT 1', [$id]);
     }
 
     public function delete(int $id): void
     {
-        $this->db->run('DELETE FROM players WHERE id = ?', [$id]);
+        $this->db->run('DELETE FROM crownd_players WHERE id = ?', [$id]);
     }
 
     /**

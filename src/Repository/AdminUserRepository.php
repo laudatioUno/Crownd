@@ -15,35 +15,35 @@ final class AdminUserRepository
     /** @return array<string, mixed>|null */
     public function find(int $id): ?array
     {
-        return $this->db->one('SELECT * FROM admin_users WHERE id = ?', [$id]);
+        return $this->db->one('SELECT * FROM crownd_admin_users WHERE id = ?', [$id]);
     }
 
     /** @return array<string, mixed>|null */
     public function findByUsername(string $username): ?array
     {
-        return $this->db->one('SELECT * FROM admin_users WHERE username = ?', [strtolower(trim($username))]);
+        return $this->db->one('SELECT * FROM crownd_admin_users WHERE username = ?', [strtolower(trim($username))]);
     }
 
     /** @return list<array<string, mixed>> */
     public function all(): array
     {
-        return $this->db->all('SELECT * FROM admin_users ORDER BY active DESC, display_name');
+        return $this->db->all('SELECT * FROM crownd_admin_users ORDER BY active DESC, display_name');
     }
 
     public function countActive(): int
     {
-        return (int) $this->db->value('SELECT COUNT(*) FROM admin_users WHERE active = 1');
+        return (int) $this->db->value('SELECT COUNT(*) FROM crownd_admin_users WHERE active = 1');
     }
 
     /** @param array{username: string, display_name: string, password_hash: string} $data */
     public function create(array $data): int
     {
-        return $this->db->insert('admin_users', $data + ['active' => 1, 'created_at' => Database::now()]);
+        return $this->db->insert('crownd_admin_users', $data + ['active' => 1, 'created_at' => Database::now()]);
     }
 
     /** @param array<string, mixed> $data */
     public function update(int $id, array $data): void
     {
-        $this->db->update('admin_users', $data, ['id' => $id]);
+        $this->db->update('crownd_admin_users', $data, ['id' => $id]);
     }
 }

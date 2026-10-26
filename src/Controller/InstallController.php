@@ -76,8 +76,8 @@ final class InstallController extends Controller
         }
 
         try {
-            $hasAdmins = (int) $db->value("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'admin_users'") > 0
-                && (int) $db->value('SELECT COUNT(*) FROM admin_users') > 0;
+            $hasAdmins = (int) $db->value("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'crownd_admin_users'") > 0
+                && (int) $db->value('SELECT COUNT(*) FROM crownd_admin_users') > 0;
             if ($hasAdmins) {
                 return $this->form($input, ['_form' => 'install.db_not_empty'], 422);
             }

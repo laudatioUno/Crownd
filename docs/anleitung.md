@@ -5,7 +5,7 @@
 Crownd ersetzt den bisherigen Redirect auf `/mvp`. Der Link (und damit ein bereits gedruckter QR-Code) bleibt gleich.
 
 1. Release-Datei `crownd-<version>.zip` unter **Releases** herunterladen (nicht «Source code»).
-2. Auf dem Webspace eine leere MySQL/MariaDB-Datenbank anlegen.
+2. Eine MySQL/MariaDB-Datenbank bereitstellen. Eine bestehende geht auch: Alle Tabellen von Crownd beginnen mit `crownd_` und kommen anderen Anwendungen nicht in die Quere.
 3. **Alten Redirect entfernen:** In der `.htaccess` im Hauptordner von `rhcd.abitar.ch` die Regel löschen, die `/mvp` auf `mvp.php` umleitet, und `mvp.php` (samt `api/` und `data/` des Redirect-Tools) entfernen oder umbenennen. Sonst landet `/mvp` weiterhin beim Redirect.
 4. Den Ordner `crownd` aus dem ZIP per FTP als Ordner **`mvp`** in den Hauptordner hochladen. Ergebnis: `…/mvp/public`, `…/mvp/src`, `…/mvp/.htaccess` usw.
 5. Die Ordner `mvp/config` und `mvp/storage` (mit Unterordnern) beschreibbar machen.

@@ -28,7 +28,7 @@ final class Migrator
     public function migrate(): array
     {
         $this->db->run(
-            'CREATE TABLE IF NOT EXISTS schema_migrations (
+            'CREATE TABLE IF NOT EXISTS crownd_schema_migrations (
                 version VARCHAR(64) NOT NULL PRIMARY KEY,
                 applied_at DATETIME NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
@@ -40,7 +40,7 @@ final class Migrator
             foreach (self::splitStatements((string) file_get_contents($files[$version])) as $statement) {
                 $this->db->pdo()->exec($statement);
             }
-            $this->db->insert('schema_migrations', ['version' => $version, 'applied_at' => Database::now()]);
+            $this->db->insert('crownd_schema_migrations', ['version' => $version, 'applied_at' => Database::now()]);
             $done[] = $version;
         }
 
@@ -64,7 +64,7 @@ final class Migrator
     {
         try {
             return array_map('strval', array_column(
-                $this->db->all('SELECT version FROM schema_migrations'),
+                $this->db->all('SELECT version FROM crownd_schema_migrations'),
                 'version',
             ));
         } catch (\PDOException) {

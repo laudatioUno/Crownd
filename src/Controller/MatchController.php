@@ -392,7 +392,7 @@ final class MatchController extends Controller
     private function competitions(): array
     {
         return array_map('strval', array_column($this->app->db()->all(
-            'SELECT DISTINCT competition FROM matches WHERE competition IS NOT NULL ORDER BY competition LIMIT 30',
+            'SELECT DISTINCT competition FROM crownd_matches WHERE competition IS NOT NULL ORDER BY competition LIMIT 30',
         ), 'competition'));
     }
 }

@@ -24,17 +24,17 @@ final class RateLimiter
         $keyHash = hash('sha256', $bucket . '|' . $key);
 
         $this->db->run(
-            'INSERT INTO rate_limits (bucket, key_hash, window_start, hits) VALUES (?, ?, ?, 1)
+            'INSERT INTO crownd_rate_limits (bucket, key_hash, window_start, hits) VALUES (?, ?, ?, 1)
              ON DUPLICATE KEY UPDATE hits = hits + 1',
             [$bucket, $keyHash, $window],
         );
         $hits = (int) $this->db->value(
-            'SELECT hits FROM rate_limits WHERE bucket = ? AND key_hash = ? AND window_start = ?',
+            'SELECT hits FROM crownd_rate_limits WHERE bucket = ? AND key_hash = ? AND window_start = ?',
             [$bucket, $keyHash, $window],
         );
 
         if (random_int(1, 50) === 1) {
-            $this->db->run('DELETE FROM rate_limits WHERE window_start < ?', [$now - 86400]);
+            $this->db->run('DELETE FROM crownd_rate_limits WHERE window_start < ?', [$now - 86400]);
         }
 
         return $hits <= $limit;

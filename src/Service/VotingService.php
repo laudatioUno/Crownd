@@ -49,14 +49,14 @@ final class VotingService
             return null;
         }
         $ballot = $this->db->one(
-            'SELECT id FROM ballots WHERE match_id = ? AND voter_hash = ?',
+            'SELECT id FROM crownd_ballots WHERE match_id = ? AND voter_hash = ?',
             [$matchId, self::voterHash($matchId, $token)],
         );
         if ($ballot === null) {
             return null;
         }
         $choices = [];
-        foreach ($this->db->all('SELECT team_id, player_id FROM votes WHERE ballot_id = ?', [(int) $ballot['id']]) as $row) {
+        foreach ($this->db->all('SELECT team_id, player_id FROM crownd_votes WHERE ballot_id = ?', [(int) $ballot['id']]) as $row) {
             $choices[(int) $row['team_id']] = (int) $row['player_id'];
         }
 
@@ -100,13 +100,13 @@ final class VotingService
 
         try {
             $this->db->transaction(function (Database $db) use ($matchId, $token, $valid): void {
-                $ballotId = $db->insert('ballots', [
+                $ballotId = $db->insert('crownd_ballots', [
                     'match_id' => $matchId,
                     'voter_hash' => self::voterHash($matchId, $token),
                     'created_at' => Database::now(),
                 ]);
                 foreach ($valid as $teamId => $playerId) {
-                    $db->insert('votes', [
+                    $db->insert('crownd_votes', [
                         'ballot_id' => $ballotId,
                         'match_id' => $matchId,
                         'team_id' => $teamId,

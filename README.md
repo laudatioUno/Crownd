@@ -37,7 +37,7 @@ Works for any team sport; made for clubs that want their own tool on ordinary sh
 ## Requirements
 
 - PHP **8.3 or newer** with `pdo_mysql`, `sodium`, `gd`, `mbstring` (`exif` optional, for upright phone photos)
-- MySQL 8.0+ or MariaDB 10.6+ (an empty database)
+- MySQL 8.0+ or MariaDB 10.6+ – an own database or an existing one: all tables start with `crownd_`, so Crownd can share a database with other applications
 - HTTPS
 - Works on ordinary shared hosting: no root access, no containers, no Composer on the server, no cron job
 
