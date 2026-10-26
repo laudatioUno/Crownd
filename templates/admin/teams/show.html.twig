@@ -1,0 +1,139 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ team.name }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <p class="breadcrumb"><a href="{{ url('/admin/teams') }}">← {{ t('teams.title') }}</a></p>
+      <div class="row">
+        {{ m.team_logo(team.logo_file, team.name, team.id, 'lg') }}
+        <h1 class="h1">{{ team.name }}</h1>
+        {% if team.archived %}<span class="badge badge--muted">{{ t('teams.archived_badge') }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="layout-2">
+    <div class="stack-lg">
+      <section class="card stack" id="players" aria-labelledby="players-title">
+        <div class="section-title">
+          <h2 class="h2" id="players-title">{{ t('players.title') }} <span class="muted">({{ players|filter(p => not p.archived)|length }})</span></h2>
+        </div>
+        {% if players %}
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th class="num">{{ t('players.number') }}</th><th>{{ t('players.name') }}</th><th>{{ t('players.squads') }}</th><th><span class="visually-hidden">{{ t('app.edit') }}</span></th></tr></thead>
+              <tbody>
+              {% for p in players %}
+                <tr>
+                  <td class="num"><span class="number">{{ p.number ?? '' }}</span></td>
+                  <td>
+                    <div class="player-row">
+                      {{ m.avatar(p, 'sm', team.id) }}
+                      <div>
+                        <div class="player-row__name">{{ p.name }}{% if p.archived %} <span class="badge badge--muted">{{ t('players.archived_badge') }}</span>{% endif %}</div>
+                        {% if p.position %}<div class="player-row__sub">{{ p.position }}</div>{% endif %}
+                      </div>
+                    </div>
+                  </td>
+                  <td><div class="tags">{% for s in membership[p.id] ?? [] %}<span class="tag">{{ s }}</span>{% endfor %}</div></td>
+                  <td class="num"><a href="{{ url('/admin/players/' ~ p.id) }}" class="btn btn--secondary btn--small">{{ t('app.edit') }}</a></td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="muted">{{ t('players.empty') }}</p>
+        {% endif %}
+
+        <details class="disclosure"{% if player_errors or not players %} open{% endif %}>
+          <summary>{{ t('players.add_one') }}</summary>
+          <form method="post" action="{{ url('/admin/teams/' ~ team.id ~ '/players') }}" enctype="multipart/form-data" class="stack" novalidate>
+            {{ csrf_field() }}
+            <div class="grid-2">
+              {{ m.field('name', t('players.name'), player_values.name, player_errors, 'text', {required: true, maxlength: 100, help: t('players.name_help')}) }}
+              {{ m.field('number', t('players.number_long'), player_values.number, player_errors, 'text', {optional: true, inputmode: 'numeric', maxlength: 4}) }}
+            </div>
+            <div class="grid-2">
+              {{ m.field('position', t('players.position'), player_values.position, player_errors, 'text', {optional: true, maxlength: 40, help: t('players.position_help')}) }}
+              {{ m.field('photo', t('players.photo'), '', player_errors, 'file', {optional: true, accept: 'image/png,image/jpeg,image/webp', help: t('players.photo_help')}) }}
+            </div>
+            {% if squads %}
+              <fieldset class="fieldset stack-sm">
+                <legend class="label">{{ t('players.add_to_squads') }}</legend>
+                <div class="row">{% for s in squads %}<label class="check"><input type="checkbox" name="squads[]" value="{{ s.id }}" checked> {{ s.name }}</label>{% endfor %}</div>
+              </fieldset>
+            {% endif %}
+            <div><button type="submit" class="btn btn--primary">{{ t('players.add') }}</button></div>
+          </form>
+        </details>
+
+        <details class="disclosure">
+          <summary>{{ t('players.add_list') }}</summary>
+          <form method="post" action="{{ url('/admin/teams/' ~ team.id ~ '/players/bulk') }}" class="stack">
+            {{ csrf_field() }}
+            {{ m.textarea('list', t('players.list'), '', {}, {rows: 8, placeholder: t('players.list_placeholder'), help: t('players.list_help')}) }}
+            {% if squads %}
+              <fieldset class="fieldset stack-sm">
+                <legend class="label">{{ t('players.add_to_squads') }}</legend>
+                <div class="row">{% for s in squads %}<label class="check"><input type="checkbox" name="squads[]" value="{{ s.id }}" checked> {{ s.name }}</label>{% endfor %}</div>
+              </fieldset>
+            {% endif %}
+            <div><button type="submit" class="btn btn--primary">{{ t('players.add') }}</button></div>
+          </form>
+        </details>
+      </section>
+    </div>
+
+    <div class="stack-lg">
+      <section class="card stack" id="squads" aria-labelledby="squads-title">
+        <h2 class="h2" id="squads-title">{{ t('squads.title') }}</h2>
+        <p class="muted small">{{ t('squads.intro') }}</p>
+        {% if squads %}
+          <ul class="stack-sm" role="list">
+            {% for s in squads %}
+              <li class="row row--between"><span><strong>{{ s.name }}</strong> <span class="muted small">· {{ t('teams.players_count', {count: s.player_count}) }}</span></span><a href="{{ url('/admin/squads/' ~ s.id) }}" class="btn btn--secondary btn--small">{{ t('app.edit') }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <form method="post" action="{{ url('/admin/teams/' ~ team.id ~ '/squads') }}" class="row">
+          {{ csrf_field() }}
+          <label class="visually-hidden" for="f-squad-name">{{ t('squads.name') }}</label>
+          <div class="field"><input id="f-squad-name" type="text" name="name" maxlength="100" placeholder="{{ t('squads.name_placeholder') }}" required></div>
+          <button type="submit" class="btn btn--secondary">{{ t('squads.create') }}</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <details class="disclosure"{% if errors %} open{% endif %}>
+          <summary>{{ t('teams.details') }}: {{ t('app.edit') }}</summary>
+          <form method="post" action="{{ url('/admin/teams/' ~ team.id) }}" enctype="multipart/form-data" class="stack" novalidate>
+            {{ csrf_field() }}
+            {% include 'admin/teams/_team_fields.html.twig' %}
+            <div><button type="submit" class="btn btn--primary">{{ t('app.save') }}</button></div>
+          </form>
+        </details>
+      </section>
+
+      <section class="card stack-sm dangerzone">
+        <h2 class="h3">{{ t('teams.danger') }}</h2>
+        <p class="muted small">{{ t('teams.danger_help') }}</p>
+        <div class="row">
+          <form method="post" action="{{ url('/admin/teams/' ~ team.id ~ '/archive') }}">
+            {{ csrf_field() }}
+            <button type="submit" class="btn btn--secondary btn--small">{{ team.archived ? t('teams.restore') : t('teams.archive') }}</button>
+          </form>
+          {% if not used %}
+            <form method="post" action="{{ url('/admin/teams/' ~ team.id ~ '/delete') }}" data-confirm="{{ t('teams.delete_confirm') }}">
+              {{ csrf_field() }}
+              <button type="submit" class="btn btn--danger btn--small">{{ t('app.delete') }}</button>
+            </form>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+  </div>
+{% endblock %}

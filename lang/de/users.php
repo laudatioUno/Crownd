@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'title' => 'Admins',
+    'intro' => 'Admins erstellen Spiele, starten und beenden die Abstimmung und sehen die Resultate.',
+    'display_name' => 'Name',
+    'username' => 'Benutzername',
+    'last_login' => 'Letzte Anmeldung',
+    'never' => 'noch nie',
+    'status' => 'Status',
+    'active' => 'aktiv',
+    'inactive' => 'deaktiviert',
+    'activate' => 'Aktivieren',
+    'deactivate' => 'Deaktivieren',
+    'you' => 'du',
+    'add' => 'Admin hinzufügen',
+    'create' => 'Admin erstellen',
+    'created' => '{name} wurde als Admin erstellt.',
+    'username_taken' => 'Dieser Benutzername ist schon vergeben.',
+    'activated' => '{name} ist wieder aktiv.',
+    'deactivated' => '{name} ist deaktiviert und kann sich nicht mehr anmelden.',
+    'reset_password' => 'Neues Passwort setzen',
+    'password_reset' => 'Das Passwort von {name} ist neu gesetzt.',
+    'account_title' => 'Mein Konto',
+    'change_password' => 'Passwort ändern',
+    'change_password_help' => 'Leer lassen, wenn du das Passwort nicht ändern willst.',
+    'account_saved' => 'Dein Konto ist gespeichert.',
+];

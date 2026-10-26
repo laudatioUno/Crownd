@@ -1,0 +1,37 @@
+{% extends 'layout/public.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('vote.thanks_title') }}{% endblock %}
+{% block main_class %} pub-main--plain{% endblock %}
+
+{% block content %}
+  <div class="thanks">
+    {{ m.crown('crown crown--big') }}
+    <h1 class="thanks__title">{{ t('vote.thanks_title') }}</h1>
+    <p class="hero__text">{{ brand.thanks_text ?: (results ? '' : t('vote.thanks_text')) }}</p>
+
+    <div class="choice-list">
+      <h2 class="visually-hidden">{{ t('vote.your_vote') }}</h2>
+      {% for side in ['home', 'away'] %}
+        {% set team_id = attribute(match, side ~ '_team_id') %}
+        {% set chosen = choices[team_id] ?? null %}
+        <div class="choice">
+          {% if chosen %}{{ m.avatar(chosen, 'sm', team_id) }}{% else %}{{ m.team_logo(attribute(match, side ~ '_logo'), attribute(match, side ~ '_name'), team_id, 'sm') }}{% endif %}
+          <div>
+            <div class="choice__team">{{ attribute(match, side ~ '_name') }}</div>
+            <div class="choice__name">{{ chosen ? chosen.name : t('vote.no_vote_for_team') }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if results %}
+    <section class="stack" aria-labelledby="live-title">
+      <h2 class="h2" id="live-title">{{ t('vote.live_results') }}</h2>
+      <div data-live-url="{{ url('/results/' ~ match.id ~ '/live') }}">
+        {% include 'partials/results.html.twig' %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

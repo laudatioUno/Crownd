@@ -1,0 +1,16 @@
+{% extends 'layout/auth.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('auth.login_title') }}{% endblock %}
+
+{% block content %}
+  <h1 class="h1">{{ t('auth.login_title') }}</h1>
+  {% if error %}<div class="notice notice--error" role="alert">{{ t(error) }}</div>{% endif %}
+  <form method="post" action="{{ url('/admin/login') }}" class="stack">
+    {{ csrf_field() }}
+    {{ m.field('username', t('auth.username'), username, {}, 'text', {required: true, autocomplete: 'username', autofocus: username == ''}) }}
+    {{ m.field('password', t('auth.password'), '', {}, 'password', {required: true, autocomplete: 'current-password', autofocus: username != ''}) }}
+    <button type="submit" class="btn btn--primary btn--block">{{ t('auth.login') }}</button>
+  </form>
+  <p class="muted small">{{ t('auth.login_hint') }}</p>
+{% endblock %}

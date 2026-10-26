@@ -1,0 +1,16 @@
+{% extends 'layout/public.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ brand.award_label }} · {{ match.home_name }} {{ t('app.vs') }} {{ match.away_name }}{% endblock %}
+{% block main_class %} pub-main--plain{% endblock %}
+
+{% block content %}
+  <div class="hero">
+    <span class="hero__kicker">{{ m.crown('crown') }}{{ brand.award_label }}</span>
+    <h1 class="hero__title">{{ m.matchup_names(match) }}</h1>
+    {% set meta = m.match_meta(match)|trim %}{% if meta %}<p class="hero__text">{{ meta }}</p>{% endif %}
+  </div>
+  <div data-live-url="{{ url(live_url) }}">
+    {% include 'partials/results.html.twig' %}
+  </div>
+{% endblock %}

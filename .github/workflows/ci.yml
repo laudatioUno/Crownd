@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: PHP version
+        run: php -v && composer --version
+      - name: Install dependencies (from composer.lock)
+        run: composer install --no-interaction --no-progress
+      - name: Lint
+        run: find src bin lang public -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+      - name: Unit tests
+        run: vendor/bin/phpunit
+      - name: Security advisories
+        run: composer audit --no-dev
+
+  # Test package for pull requests: the same ZIP as a release, to try it on a server
+  # before merging. Download it on the PR's "Checks" tab › CI › Summary › Artifacts.
+  package:
+    if: github.event_name == 'pull_request'
+    needs: test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build ZIP
+        id: build
+        run: |
+          VERSION="$(php -r 'require "src/App.php"; echo Crownd\App::VERSION;')-pr${{ github.event.pull_request.number }}"
+          bin/build-release.sh "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      # archive: false uploads the release ZIP itself, so the download is directly
+      # crownd-<version>-pr<n>.zip and not a ZIP inside another ZIP.
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          path: build/crownd-${{ steps.build.outputs.version }}.zip
+          archive: false
+          retention-days: 14

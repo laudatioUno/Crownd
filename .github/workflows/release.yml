@@ -1,0 +1,109 @@
+name: Release
+
+# Builds the release ZIP (application + all libraries from composer.lock) and publishes
+# it as a GitHub release with release notes.
+#
+# Automatic: on every push to main (e.g. merging a pull request) the workflow reads the
+# version from Crownd\App::VERSION in src/App.php. If there is no release v<version> yet,
+# it runs the tests, builds the ZIP, creates the tag and publishes the release.
+# If the release already exists, nothing happens.
+#
+# So a new release is: raise App::VERSION, add a section "## [x.y.z] – YYYY-MM" to
+# CHANGELOG.md, merge the pull request. Done.
+#
+# The release notes are that CHANGELOG.md section; without one, GitHub generates them
+# from the merged pull requests. Versions with a suffix (1.2.0-beta.1) become pre-releases.
+#
+# By hand: Actions › Release › "Run workflow" (e.g. to retry after a failed run).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Never build the same release twice in parallel (e.g. two quick merges).
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Determine version
+        id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::Releases are only made from the main branch."; exit 1
+          fi
+          VERSION=$(php -r 'require "src/App.php"; echo Crownd\App::VERSION;')
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'; then
+            echo "::error::App::VERSION '$VERSION' in src/App.php is not of the form 1.2.3 or 1.2.3-beta.1"; exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Release v$VERSION already exists – nothing to do. Raise App::VERSION in src/App.php for a new release." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Tests
+        if: steps.v.outputs.exists == 'false'
+        run: composer install --no-interaction --no-progress && vendor/bin/phpunit && composer audit --no-dev
+
+      - name: Build ZIP
+        if: steps.v.outputs.exists == 'false'
+        run: bin/build-release.sh "${{ steps.v.outputs.version }}"
+
+      - name: Release notes
+        if: steps.v.outputs.exists == 'false'
+        id: notes
+        env:
+          VERSION: ${{ steps.v.outputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          # The section of this version in CHANGELOG.md: everything below "## [x.y.z]" up to the next "## [".
+          awk -v v="[$VERSION]" '/^## \[/ { p = index($0, v) > 0; next } p' CHANGELOG.md \
+            | sed -e '/./,$!d' > build/changelog.md || true
+          if [ -s build/changelog.md ]; then
+            cp build/changelog.md build/notes.md
+            echo "source=changelog" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::CHANGELOG.md has no section [$VERSION]; GitHub generates the release notes."
+            : > build/notes.md
+            echo "source=generated" >> "$GITHUB_OUTPUT"
+          fi
+          {
+            echo
+            echo "### Installation and update"
+            echo
+            echo "Download **crownd-$VERSION.zip** below (not «Source code»: it lacks the libraries)."
+            echo "When updating, keep \`config/config.php\` and \`storage/uploads/\`; database updates run at the next admin login."
+            echo "See the [README](https://github.com/$REPO/blob/v$VERSION/README.md#installation) for details."
+          } >> build/notes.md
+
+      - name: Create GitHub release
+        if: steps.v.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.v.outputs.version }}
+          TAG: ${{ steps.v.outputs.tag }}
+          SOURCE: ${{ steps.notes.outputs.source }}
+        run: |
+          ARGS=(--target "$GITHUB_SHA" --title "Crownd $TAG" --notes-file build/notes.md)
+          if [ "$SOURCE" = "generated" ]; then ARGS+=(--generate-notes); fi
+          case "$VERSION" in *-*) ARGS+=(--prerelease) ;; *) ARGS+=(--latest) ;; esac
+          gh release create "$TAG" "build/crownd-$VERSION.zip" "${ARGS[@]}"
+          {
+            echo "Released **Crownd $TAG** with crownd-$VERSION.zip."
+            echo
+            echo "https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG"
+          } >> "$GITHUB_STEP_SUMMARY"

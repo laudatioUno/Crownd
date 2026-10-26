@@ -1,0 +1,43 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ squad.name }}{% endblock %}
+
+{% block content %}
+  <div>
+    <p class="breadcrumb"><a href="{{ url('/admin/teams/' ~ team.id ~ '#squads') }}">← {{ team.name }}</a></p>
+    <h1 class="h1">{{ t('squads.edit') }}: {{ squad.name }}</h1>
+  </div>
+  <form method="post" action="{{ url('/admin/squads/' ~ squad.id) }}" class="card stack" data-checklist>
+    {{ csrf_field() }}
+    {{ m.field('name', t('squads.name'), squad.name, {}, 'text', {required: true, maxlength: 100}) }}
+    <div class="lineup__tools">
+      <span class="label">{{ t('squads.players_help') }} <span class="muted" data-check-count data-template="({n} / {total})"></span></span>
+      <span class="row">
+        <button type="button" class="btn btn--secondary btn--small" data-check-all="1" hidden>{{ t('squads.all') }}</button>
+        <button type="button" class="btn btn--secondary btn--small" data-check-all="0" hidden>{{ t('squads.none') }}</button>
+      </span>
+    </div>
+    {% if players %}
+      <div class="lineup">
+        {% for p in players %}
+          <label class="lineup__item">
+            <input type="checkbox" name="players[]" value="{{ p.id }}"{{ p.id in selected ? ' checked' }}>
+            {{ m.avatar(p, 'sm', team.id) }}
+            <span class="lineup__name">{% if p.number is not null %}<span class="number">{{ p.number }}</span> {% endif %}{{ p.name }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">{{ t('squads.no_players') }}</p>
+    {% endif %}
+    <div class="row">
+      <button type="submit" class="btn btn--primary">{{ t('app.save') }}</button>
+      <a href="{{ url('/admin/teams/' ~ team.id ~ '#squads') }}" class="btn btn--secondary">{{ t('app.cancel') }}</a>
+    </div>
+  </form>
+  <form method="post" action="{{ url('/admin/squads/' ~ squad.id ~ '/delete') }}" data-confirm="{{ t('squads.delete_confirm') }}">
+    {{ csrf_field() }}
+    <button type="submit" class="btn btn--danger btn--small">{{ t('app.delete') }}</button>
+  </form>
+{% endblock %}

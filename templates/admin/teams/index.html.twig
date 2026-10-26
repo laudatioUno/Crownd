@@ -1,0 +1,30 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('teams.title') }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1 class="h1">{{ t('teams.title') }}</h1>
+      <p class="lead">{{ t('teams.intro') }}</p>
+    </div>
+    <a href="{{ url('/admin/teams/new') }}" class="btn btn--primary">{{ t('teams.new') }}</a>
+  </div>
+  {% if teams %}
+    <div class="team-list">
+      {% for team in teams %}
+        <a href="{{ url('/admin/teams/' ~ team.id) }}" class="team-tile team-{{ team.id }}{{ team.archived ? ' is-archived' }}">
+          {{ m.team_logo(team.logo_file, team.name, team.id) }}
+          <span>
+            <span class="team-tile__name">{{ team.name }}</span>
+            {% if team.archived %} <span class="badge badge--muted">{{ t('teams.archived_badge') }}</span>{% endif %}<br>
+            <span class="muted small">{{ t('teams.players_count', {count: team.player_count}) }} · {{ t('teams.squads_count', {count: team.squad_count}) }}</span>
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card"><p>{{ t('teams.empty') }}</p></div>
+  {% endif %}
+{% endblock %}

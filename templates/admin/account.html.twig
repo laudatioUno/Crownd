@@ -1,0 +1,20 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('users.account_title') }}{% endblock %}
+
+{% block content %}
+  <h1 class="h1">{{ t('users.account_title') }}</h1>
+  <form method="post" action="{{ url('/admin/account') }}" class="card stack" novalidate>
+    {{ csrf_field() }}
+    {{ m.field('display_name', t('users.display_name'), values.display_name, errors, 'text', {required: true, autocomplete: 'name'}) }}
+    <h2 class="h2">{{ t('users.change_password') }}</h2>
+    <p class="muted">{{ t('users.change_password_help') }}</p>
+    {{ m.field('current_password', t('auth.current_password'), '', errors, 'password', {autocomplete: 'current-password'}) }}
+    <div class="grid-2">
+      {{ m.field('new_password', t('auth.new_password'), '', errors, 'password', {autocomplete: 'new-password', help: t('auth.password_help')}) }}
+      {{ m.field('new_password_confirm', t('auth.new_password_confirm'), '', errors, 'password', {autocomplete: 'new-password'}) }}
+    </div>
+    <div><button type="submit" class="btn btn--primary">{{ t('app.save') }}</button></div>
+  </form>
+{% endblock %}

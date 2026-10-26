@@ -1,0 +1,38 @@
+{% extends 'layout/admin.html.twig' %}
+{% import 'partials/macros.html.twig' as m %}
+
+{% block title %}{{ t('matches.title') }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1 class="h1">{{ t('matches.title') }}</h1>
+      <p class="lead">{{ t('matches.intro') }}</p>
+    </div>
+    <a href="{{ url('/admin/matches/new') }}" class="btn btn--primary">{{ t('matches.new') }}</a>
+  </div>
+  {% if matches %}
+    <div class="match-list">
+      {% for match in matches %}
+        <a href="{{ url('/admin/matches/' ~ match.id) }}" class="match-tile">
+          <div class="stack-sm">
+            <div class="match-tile__teams">
+              {{ m.team_logo(match.home_logo, match.home_name, match.home_team_id, 'sm') }}
+              <span>{{ match.home_name }}</span>
+              <span class="muted">{{ t('app.vs') }}</span>
+              {{ m.team_logo(match.away_logo, match.away_name, match.away_team_id, 'sm') }}
+              <span>{{ match.away_name }}</span>
+            </div>
+            <div class="match-tile__meta">{{ m.match_meta(match) }}</div>
+          </div>
+          <div class="stack-sm">
+            {{ m.status_badge(match.status) }}
+            <div class="match-tile__meta">{{ m.ballots(match.ballot_count) }}</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card"><p>{{ t('matches.empty') }}</p></div>
+  {% endif %}
+{% endblock %}
