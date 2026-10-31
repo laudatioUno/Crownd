@@ -1,0 +1,90 @@
+{#
+  Player photo with crop tool. Without JavaScript it is a plain file field and the
+  server picks the cut-out itself.
+  Parameters: player (or null for a new player), team_id, errors, name_source (id of the name input)
+#}
+{% import 'partials/macros.html.twig' as m %}
+{% set error = errors.photo ?? null %}
+{% set has_original = player and player.photo_original %}
+<div class="field photo-field{{ error ? ' field--error' }}" data-cropper data-name-source="{{ name_source }}"
+     {%- if has_original %} data-original="{{ media(player.photo_original) }}" data-crop="{{ player.photo_crop }}"{% endif %}>
+  <label for="f-photo">{{ t('players.photo') }} <span class="muted">{{ t('app.optional') }}</span></label>
+
+  {% if player and player.photo_file %}
+    <div class="photo-field__current">
+      {{ m.avatar(player, 'lg', team_id) }}
+      <div class="stack-sm">
+        {% if has_original %}
+          <button type="button" class="btn btn--secondary btn--small" data-cropper-open hidden>{{ t('players.crop_change') }}</button>
+        {% else %}
+          <p class="muted small" data-cropper-hint>{{ t('players.crop_no_original') }}</p>
+        {% endif %}
+        <label class="check"><input type="checkbox" name="remove_photo" value="1"> {{ t('players.remove_photo') }}</label>
+      </div>
+    </div>
+  {% endif %}
+
+  <input id="f-photo" type="file" name="photo" accept="image/png,image/jpeg,image/webp" data-cropper-input
+    aria-describedby="{{ error ? 'e-photo' : 'h-photo' }}"{% if error %} aria-invalid="true"{% endif %}>
+  {% if error %}<p class="field__error" id="e-photo">{{ t(error) }}</p>
+  {% else %}<p class="field__help" id="h-photo">{{ t('players.photo_help') }}</p>{% endif %}
+
+  <input type="hidden" name="crop_x" value="" data-crop-field="x">
+  <input type="hidden" name="crop_y" value="" data-crop-field="y">
+  <input type="hidden" name="crop_size" value="" data-crop-field="size">
+
+  <div class="crop" data-cropper-ui hidden>
+    <div class="crop__left">
+      <div class="crop__stage" data-cropper-stage tabindex="0" role="group" aria-label="{{ t('players.crop_label') }}">
+        <img src="data:," alt="" data-cropper-img draggable="false">
+        <span class="crop__mask" aria-hidden="true"></span>
+        <span class="crop__grip" aria-hidden="true">✥ {{ t('players.crop_drag') }}</span>
+      </div>
+      <div class="crop__tools">
+        <span class="crop__z" aria-hidden="true">−</span>
+        <input type="range" min="100" max="400" step="1" value="100" aria-label="{{ t('players.crop_zoom') }}" data-cropper-zoom>
+        <span class="crop__z" aria-hidden="true">+</span>
+      </div>
+      <div class="crop__foot">
+        <button type="button" class="link-btn" data-cropper-reset>{{ t('players.crop_reset') }}</button>
+        <span class="muted small">{{ t('players.crop_hint') }}</span>
+      </div>
+    </div>
+
+    <div class="crop__right stack">
+      <h3 class="h3">{{ t('players.crop_preview') }}</h3>
+      <div class="previews">
+        <div class="preview">
+          <div class="preview__label">{{ t('players.crop_ballot') }}</div>
+          <div class="pick pick--preview">
+            <span class="pick__card">
+              <span class="pick__photo team-{{ team_id }}">
+                <span class="avatar team-{{ team_id }}"><span class="cropped" data-cropper-preview><img src="data:," alt=""></span></span>
+                {% if player and player.number is not null %}<span class="pick__no team-{{ team_id }}" data-preview-number>{{ player.number }}</span>{% endif %}
+              </span>
+              <span class="pick__name" data-preview-name>{{ player ? player.name : '' }}</span>
+            </span>
+          </div>
+        </div>
+        <div class="preview">
+          <div class="preview__label">{{ t('players.crop_mvp') }}</div>
+          <div class="mvp mvp--preview">
+            <div class="mvp__person">
+              <span class="avatar"><span class="cropped" data-cropper-preview><img src="data:," alt=""></span></span>
+              <div class="mvp__name" data-preview-name>{{ player ? player.name : '' }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="preview">
+          <div class="preview__label">{{ t('players.crop_small') }}</div>
+          <div class="preview__row">
+            <span class="avatar avatar--sm"><span class="cropped" data-cropper-preview><img src="data:," alt=""></span></span>
+            <strong data-preview-name>{{ player ? player.name : '' }}</strong>
+          </div>
+          <p class="muted small">{{ t('players.crop_small_help') }}</p>
+        </div>
+      </div>
+      <p class="notice small">{{ t('players.crop_note') }}</p>
+    </div>
+  </div>
+</div>

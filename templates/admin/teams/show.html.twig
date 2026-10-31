@@ -57,10 +57,8 @@
               {{ m.field('name', t('players.name'), player_values.name, player_errors, 'text', {required: true, maxlength: 100, help: t('players.name_help')}) }}
               {{ m.field('number', t('players.number_long'), player_values.number, player_errors, 'text', {optional: true, inputmode: 'numeric', maxlength: 4}) }}
             </div>
-            <div class="grid-2">
-              {{ m.field('position', t('players.position'), player_values.position, player_errors, 'text', {optional: true, maxlength: 40, help: t('players.position_help')}) }}
-              {{ m.field('photo', t('players.photo'), '', player_errors, 'file', {optional: true, accept: 'image/png,image/jpeg,image/webp', help: t('players.photo_help')}) }}
-            </div>
+            {{ m.field('position', t('players.position'), player_values.position, player_errors, 'text', {optional: true, maxlength: 40, help: t('players.position_help')}) }}
+            {% include 'partials/photo_field.html.twig' with {player: null, team_id: team.id, errors: player_errors, name_source: 'f-name'} only %}
             {% if squads %}
               <fieldset class="fieldset stack-sm">
                 <legend class="label">{{ t('players.add_to_squads') }}</legend>
