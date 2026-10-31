@@ -8,6 +8,7 @@ use Crownd\Http\Request;
 use Crownd\Http\Response;
 use Crownd\Repository\PlayerRepository;
 use Crownd\Service\Branding;
+use Crownd\Service\ImageUpload;
 use Crownd\Validation;
 
 /**
@@ -102,7 +103,7 @@ final class TeamController extends Controller
             return $this->redirect('/admin/teams/' . $team['id']);
         }
         foreach ($this->app->players()->forTeam((int) $team['id'], true) as $player) {
-            $this->app->images()->delete($player['photo_file']);
+            $this->deletePhotoFiles($player);
         }
         $this->app->images()->delete($team['logo_file']);
         $this->app->teams()->delete((int) $team['id']);
@@ -116,18 +117,13 @@ final class TeamController extends Controller
         $this->admin();
         $team = self::found($this->app->teams()->find(self::id($params)));
         [$values, $errors] = $this->playerInput($request);
-        $photo = $this->upload($request, 'photo', $errors, true);
+        $photo = $this->uploadPhoto($request, $errors);
         if ($errors !== []) {
-            if (is_string($photo)) {
-                $this->app->images()->delete($photo);
-            }
+            $this->deletePhotoFiles($photo ?? []);
 
             return $this->teamPage($team, $team, [], ['values' => $values, 'errors' => $errors], 422);
         }
-        $id = $this->app->players()->create(self::playerData($values) + [
-            'team_id' => (int) $team['id'],
-            'photo_file' => is_string($photo) ? $photo : null,
-        ]);
+        $id = $this->app->players()->create(self::playerData($values) + ['team_id' => (int) $team['id']] + ($photo ?? []));
         $this->addToSquads($request, (int) $team['id'], [$id]);
         $this->flash('success', 'players.created', ['name' => $values['name']]);
 
@@ -166,17 +162,22 @@ final class TeamController extends Controller
         $this->admin();
         $player = self::found($this->app->players()->find(self::id($params)));
         [$values, $errors] = $this->playerInput($request);
-        $photo = $this->upload($request, 'photo', $errors, true);
+        $photo = $this->uploadPhoto($request, $errors);
         if ($errors !== []) {
-            if (is_string($photo)) {
-                $this->app->images()->delete($photo);
-            }
+            $this->deletePhotoFiles($photo ?? []);
 
             return $this->playerForm($player, $values, $errors, 422);
         }
         $data = self::playerData($values) + ['archived' => $request->input('archived') === '1' ? 1 : 0];
-        if (is_string($photo) || $request->input('remove_photo') === '1') {
-            $data['photo_file'] = is_string($photo) ? $photo : null;
+        if ($photo !== null) {
+            $data += $photo;
+            $this->deletePhotoFiles($player);
+        } elseif ($request->input('remove_photo') === '1') {
+            $data += ['photo_file' => null, 'photo_original' => null, 'photo_crop' => null];
+            $this->deletePhotoFiles($player);
+        } elseif (($recut = $this->recutPhoto($request, $player)) !== null) {
+            // Only the cut-out of the existing photo was changed.
+            $data += $recut;
             $this->app->images()->delete($player['photo_file']);
         }
         $this->app->players()->update((int) $player['id'], $data);
@@ -201,7 +202,7 @@ final class TeamController extends Controller
             $this->app->players()->update((int) $player['id'], ['archived' => 1]);
             $this->flash('success', 'players.archived_instead', ['name' => (string) $player['name']]);
         } else {
-            $this->app->images()->delete($player['photo_file']);
+            $this->deletePhotoFiles($player);
             $this->app->players()->delete((int) $player['id']);
             $this->flash('success', 'players.deleted', ['name' => (string) $player['name']]);
         }
@@ -387,6 +388,71 @@ final class TeamController extends Controller
             'number' => $values['number'] === '' ? null : (int) $values['number'],
             'position' => $values['position'] !== '' ? $values['position'] : null,
         ];
+    }
+
+    /**
+     * Stores an uploaded player photo with the cut-out chosen in the crop tool.
+     *
+     * @param array<string, string> $errors
+     * @return array{photo_file: string, photo_original: string, photo_crop: string|null}|null null when no file was chosen or on error
+     */
+    private function uploadPhoto(Request $request, array &$errors): ?array
+    {
+        $file = $request->file('photo');
+        if ($file === null) {
+            return null;
+        }
+        $crop = self::cropInput($request);
+        try {
+            $stored = $this->app->images()->storePhoto($file, $crop);
+        } catch (\InvalidArgumentException $e) {
+            $errors['photo'] = $e->getMessage();
+
+            return null;
+        }
+
+        return [
+            'photo_file' => $stored['photo'],
+            'photo_original' => $stored['original'],
+            'photo_crop' => $crop === null ? null : self::cropString($crop),
+        ];
+    }
+
+    /**
+     * A new cut-out of the stored original, if the crop tool sent one that differs from the saved one.
+     *
+     * @param array<string, mixed> $player
+     * @return array{photo_file: string, photo_crop: string}|null
+     */
+    private function recutPhoto(Request $request, array $player): ?array
+    {
+        $crop = self::cropInput($request);
+        $original = (string) ($player['photo_original'] ?? '');
+        if ($crop === null || $original === '' || self::cropString($crop) === (string) $player['photo_crop']) {
+            return null;
+        }
+        $photo = $this->app->images()->recrop($original, $crop);
+
+        return $photo === null ? null : ['photo_file' => $photo, 'photo_crop' => self::cropString($crop)];
+    }
+
+    /** @return array{x: float, y: float, size: float}|null */
+    private static function cropInput(Request $request): ?array
+    {
+        return ImageUpload::parseCrop($request->input('crop_x'), $request->input('crop_y'), $request->input('crop_size'));
+    }
+
+    /** @param array{x: float, y: float, size: float} $crop */
+    private static function cropString(array $crop): string
+    {
+        return sprintf('%.5F,%.5F,%.5F', $crop['x'], $crop['y'], $crop['size']);
+    }
+
+    /** @param array<string, mixed> $player photo_file and photo_original of a player (or of a new upload) */
+    private function deletePhotoFiles(array $player): void
+    {
+        $this->app->images()->delete($player['photo_file'] ?? null);
+        $this->app->images()->delete($player['photo_original'] ?? null);
     }
 
     /** @param list<int> $playerIds */

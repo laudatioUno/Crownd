@@ -15,7 +15,7 @@ Crownd ersetzt den bisherigen Redirect auf `/mvp`. Der Link (und damit ein berei
 
 1. **Einstellungen:** Vereinslogo, Vereinsfarbe und den Namen der Auszeichnung («Player of the Match» oder «MVP»).
 2. **Mannschaften:** Eigene Mannschaft und die Gegner anlegen, je mit Logo.
-3. **Spieler:** Pro Mannschaft einzeln mit Foto oder als Liste einfügen (`12 Nico Muster`, eine Zeile pro Spieler). Das Foto ist freiwillig.
+3. **Spieler:** Pro Mannschaft einzeln mit Foto oder als Liste einfügen (`12 Nico Muster`, eine Zeile pro Spieler). Das Foto ist freiwillig. Nach der Fotowahl erscheint ein runder Rahmen: Foto ziehen und zoomen, bis das Gesicht gut im Kreis sitzt – die Vorschau zeigt, wie es auf dem Stimmzettel, der MVP-Karte und in den Listen aussieht. Den Ausschnitt kannst du später unter *Spieler bearbeiten › Ausschnitt ändern* anpassen. Fotos aus Version 1.0 lädst du dafür einmal neu hoch.
 4. **Vorlagen:** Bei der eigenen Mannschaft eine Vorlage wie «NLA» erstellen und abhaken, wer dazugehört.
 5. **Plakat:** Unter Übersicht › *Plakat drucken* den QR-Code ausdrucken und aufhängen. Er gilt für alle Spiele.
 

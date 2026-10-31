@@ -35,11 +35,12 @@
                 <input type="radio" name="pick_{{ team_id }}" value="{{ p.id }}"{{ (picks[team_id] ?? 0) == p.id ? ' checked' }}>
                 <span class="pick__card">
                   <span class="pick__check" aria-hidden="true">✓</span>
-                  {{ m.avatar(p, '', team_id) }}
+                  <span class="pick__photo">
+                    {{ m.avatar(p, '', team_id) }}
+                    {% if p.number is not null %}<span class="pick__no team-{{ team_id }}"><span class="visually-hidden">{{ t('players.number_long') }} </span>{{ p.number }}</span>{% endif %}
+                  </span>
                   <span class="pick__name">{{ p.name }}</span>
-                  {% if p.number is not null or p.position %}
-                    <span class="pick__meta">{% if p.number is not null %}#{{ p.number }}{% endif %}{% if p.number is not null and p.position %} · {% endif %}{{ p.position }}</span>
-                  {% endif %}
+                  {% if p.position %}<span class="pick__meta">{{ p.position }}</span>{% endif %}
                 </span>
               </label>
             {% endfor %}

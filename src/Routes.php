@@ -32,7 +32,7 @@ final class Routes
 
         // Assets
         $r->get('/theme.css', $c(AssetController::class, 'theme'));
-        $r->get('/media/{file:[a-f0-9]+\.png}', $c(AssetController::class, 'media'));
+        $r->get('/media/{file:[a-f0-9]+\.(?:png|jpg)}', $c(AssetController::class, 'media'));
 
         // Installation
         $r->get('/install', $c(InstallController::class, 'show'));

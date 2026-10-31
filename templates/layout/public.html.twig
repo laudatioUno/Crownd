@@ -16,7 +16,7 @@
 </main>
 <footer class="pub-foot">
   <p class="pub-foot__links">
-    <span>{{ t('app.powered_by') }}</span>
+    <span>{{ t('app.powered_by') }} {{ version }}</span>
     {% if brand.privacy_url %}<a href="{{ brand.privacy_url }}" rel="noopener">{{ t('app.privacy') }}</a>{% endif %}
     <a href="{{ url('/admin') }}">{{ t('app.admin_login') }}</a>
   </p>

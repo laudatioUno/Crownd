@@ -4,13 +4,14 @@
 
 Works for any team sport; made for clubs that want their own tool on ordinary shared hosting (PHP + MySQL/MariaDB), without platform fees or tracking.
 
-> Version **1.0.0**. A step-by-step guide in German is in [docs/anleitung.md](docs/anleitung.md).
+> Version **1.1.0**. A step-by-step guide in German is in [docs/anleitung.md](docs/anleitung.md).
 
 ## Features
 
 **Teams, players and templates**
 - Teams for your own club and the opponents, each with logo, short name and an optional team color
-- Players with name (required), shirt number, position and an optional photo (cropped square, phone photos turned upright); without a photo the initials are shown
+- Players with name (required), shirt number, position and an optional photo; without a photo the initials are shown
+- Crop tool for photos: move and zoom the photo inside a round frame (drag, slider, mouse wheel, two fingers or keyboard) with a live preview of the ballot, the MVP card and the small lists; the original is kept, so the cut-out can be changed later. Large phone photos are scaled down in the browser before the upload and turned upright
 - Add players one by one or paste a whole list (`12 Nico Muster`, `Nico Muster, 12`, `Nico Muster`)
 - Squad templates per team, e.g. «NLA» or «U17»: the players of a league or level
 - Players and teams used in a match are archived instead of deleted, so old results stay complete
@@ -21,7 +22,7 @@ Works for any team sport; made for clubs that want their own tool on ordinary sh
 - One fixed link for every match (e.g. `https://example.ch/mvp`) and a printable QR code poster
 - The page shows «not open yet» until an admin starts the vote – from the admin area or with one tap on the voting page itself (typically at half-time)
 - Optional automatic end after a number of minutes; only one vote runs at a time
-- Mobile-first ballot: one MVP per team on one ballot, photo cards, big thumb-friendly button
+- Mobile-first ballot: one MVP per team on one ballot, large round player photos with the shirt number, big thumb-friendly button
 - One vote per device and match (random device cookie, stored only as a hash); a generous rate limit per network, a honeypot against bots
 
 **Results**
@@ -62,7 +63,7 @@ location /mvp/ {
 
 Always use the release file `crownd-<version>.zip`; GitHub's "Source code" archives do not contain the libraries (`vendor/`).
 
-Keep `config/config.php` (database access and key) and `storage/uploads/` (logos and photos); everything else comes from the new release. Database updates run automatically at the next admin login.
+Keep `config/config.php` (database access and key) and `storage/uploads/` (logos, player photos and their originals); everything else comes from the new release. Database updates run automatically at the next admin login.
 
 ## Data protection
 

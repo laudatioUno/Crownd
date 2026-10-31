@@ -93,19 +93,19 @@ abstract class Controller
     }
 
     /**
-     * Stores an uploaded image field; returns the new file name, null when no file was
+     * Stores an uploaded logo; returns the new file name, null when no file was
      * chosen, or adds an error and returns false.
      *
      * @param array<string, string> $errors
      */
-    protected function upload(Request $request, string $field, array &$errors, bool $square = false): string|false|null
+    protected function upload(Request $request, string $field, array &$errors): string|false|null
     {
         $file = $request->file($field);
         if ($file === null) {
             return null;
         }
         try {
-            return $square ? $this->app->images()->storeSquare($file) : $this->app->images()->store($file);
+            return $this->app->images()->store($file);
         } catch (\InvalidArgumentException $e) {
             $errors[$field] = $e->getMessage();
 

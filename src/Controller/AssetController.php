@@ -40,7 +40,7 @@ final class AssetController extends Controller
         ]);
     }
 
-    /** Uploaded images (logos, player photos), stored outside the web root. */
+    /** Uploaded images (logos, player photos and their originals), stored outside the web root. */
     public function media(Request $request, array $params): Response
     {
         $path = $this->app->images()->path($params['file']);
@@ -49,7 +49,7 @@ final class AssetController extends Controller
         }
 
         return new Response((string) file_get_contents($path), 200, [
-            'Content-Type' => 'image/png',
+            'Content-Type' => \Crownd\Service\ImageUpload::contentType($params['file']),
             'Cache-Control' => 'public, max-age=31536000, immutable',
         ]);
     }

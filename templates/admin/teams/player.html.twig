@@ -10,18 +10,12 @@
   </div>
   <form method="post" action="{{ url('/admin/players/' ~ player.id) }}" enctype="multipart/form-data" class="card stack" novalidate>
     {{ csrf_field() }}
-    <div class="row">
-      {{ m.avatar(player, 'xl', team.id) }}
-      <div class="stack-sm">
-        {{ m.field('photo', t('players.photo'), '', errors, 'file', {optional: true, accept: 'image/png,image/jpeg,image/webp', help: t('players.photo_help')}) }}
-        {% if player.photo_file %}<label class="check"><input type="checkbox" name="remove_photo" value="1"> {{ t('players.remove_photo') }}</label>{% endif %}
-      </div>
-    </div>
     <div class="grid-2">
       {{ m.field('name', t('players.name'), values.name, errors, 'text', {required: true, maxlength: 100, help: t('players.name_help')}) }}
       {{ m.field('number', t('players.number_long'), values.number, errors, 'text', {optional: true, inputmode: 'numeric', maxlength: 4}) }}
     </div>
     {{ m.field('position', t('players.position'), values.position, errors, 'text', {optional: true, maxlength: 40, help: t('players.position_help')}) }}
+    {% include 'partials/photo_field.html.twig' with {player: player, team_id: team.id, errors: errors, name_source: 'f-name'} only %}
     {% if squads %}
       <fieldset class="fieldset stack-sm">
         <legend class="label">{{ t('players.squads') }}</legend>
