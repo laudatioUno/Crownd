@@ -4,6 +4,14 @@ All notable changes to Crownd. Versions follow [semantic versioning](https://sem
 The section of a version is used as the release notes on GitHub.
 For a new release: raise `App::VERSION` in `src/App.php`, add a section `## [x.y.z] – YYYY-MM` here and merge the pull request.
 
+## [1.1.1] – 2026-11
+
+### Added
+- «Neu laden» button on the page shown while no voting runs, so voters can check right away whether the voting has started (a plain link, works without JavaScript; shows «Wird geladen …» while loading).
+
+### Removed
+- The waiting page no longer reloads by itself every 20 seconds; voters reload it with the button when they want.
+
 ## [1.1.0] – 2026-10
 
 ### Added

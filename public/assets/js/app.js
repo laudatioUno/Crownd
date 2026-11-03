@@ -79,11 +79,23 @@
     if (inner && inner.getAttribute('data-status') === 'open') { setTimeout(tick, 4000); }
   });
 
-  // Waiting page: check every 20 seconds whether the voting has started.
-  var waiting = document.querySelector('[data-auto-reload]');
-  if (waiting) {
-    setInterval(function () { if (!document.hidden) { window.location.reload(); } }, 20000);
-  }
+  // «Neu laden» button: a plain link to the page; shows that it is loading.
+  each('[data-reload]', function (link) {
+    link.addEventListener('click', function () {
+      link.classList.add('is-loading');
+      link.setAttribute('aria-busy', 'true');
+      var label = link.querySelector('[data-reload-label]');
+      if (label && link.getAttribute('data-loading-text')) { label.textContent = link.getAttribute('data-loading-text'); }
+    });
+    // Back button (page restored from the browser cache): show the normal button again.
+    var label = link.querySelector('[data-reload-label]');
+    var original = label ? label.textContent : '';
+    window.addEventListener('pageshow', function () {
+      link.classList.remove('is-loading');
+      link.removeAttribute('aria-busy');
+      if (label) { label.textContent = original; }
+    });
+  });
 
   // Projector: full screen
   each('[data-fullscreen]', function (button) {
