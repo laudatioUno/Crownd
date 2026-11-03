@@ -98,14 +98,14 @@ abstract class Controller
      *
      * @param array<string, string> $errors
      */
-    protected function upload(Request $request, string $field, array &$errors): string|false|null
+    protected function upload(Request $request, string $field, array &$errors, int $maxEdge = 500): string|false|null
     {
         $file = $request->file($field);
         if ($file === null) {
             return null;
         }
         try {
-            return $this->app->images()->store($file);
+            return $this->app->images()->store($file, $maxEdge);
         } catch (\InvalidArgumentException $e) {
             $errors[$field] = $e->getMessage();
 

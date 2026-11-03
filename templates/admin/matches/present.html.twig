@@ -8,6 +8,7 @@
 <main class="present">
   <div class="present__head">
     <h1 class="present__title">{{ m.crown('crown') }}{{ brand.award_label }}</h1>
+    {% include 'partials/sponsor.html.twig' with {place: 'results', size: 'present'} %}
     <div class="present__tools">
       <button type="button" class="btn btn--secondary btn--small" data-fullscreen>{{ t('results.fullscreen') }}</button>
       <a href="{{ url('/admin/matches/' ~ match.id ~ '/results') }}" class="btn btn--secondary btn--small">{{ t('app.back') }}</a>

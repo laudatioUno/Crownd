@@ -17,5 +17,6 @@
     <p class="poster__text">{{ t('poster.text') }}</p>
     <img src="{{ qr }}" alt="QR-Code: {{ vote_url }}" class="poster__qr">
     <p class="poster__url">{{ vote_url|replace({'https://': '', 'http://': ''}) }}</p>
+    {% include 'partials/sponsor.html.twig' with {place: 'poster', size: 'large'} %}
   </article>
 {% endblock %}

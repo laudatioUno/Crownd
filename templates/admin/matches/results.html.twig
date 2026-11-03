@@ -25,6 +25,7 @@
       <a href="{{ url('/admin/matches/' ~ match.id ~ '/present') }}" class="btn btn--gold">{{ t('matches.present') }}</a>
     </div>
   </div>
+  {% include 'partials/sponsor.html.twig' with {place: 'results'} %}
   <div data-live-url="{{ url(live_url) }}">
     {% include 'partials/results.html.twig' %}
   </div>

@@ -1,0 +1,10 @@
+{#
+  The sponsor (settings › Sponsor), if one is set up and chosen for this place.
+  Parameters: place (waiting, ballot, thanks, results, poster), size ('' or 'large')
+#}
+{% if sponsor and place in sponsor.places %}
+  <aside class="sponsor{{ (size ?? '') ? ' sponsor--' ~ size }}" aria-label="{{ t('settings.sponsor') }}">
+    {% if sponsor.text %}<span class="sponsor__text">{{ sponsor.text }}</span>{% endif %}
+    <span class="sponsor__logo"><img src="{{ media(sponsor.logo) }}" alt="{{ sponsor.name }}"></span>
+  </aside>
+{% endif %}

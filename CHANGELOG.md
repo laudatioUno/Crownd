@@ -4,6 +4,14 @@ All notable changes to Crownd. Versions follow [semantic versioning](https://sem
 The section of a version is used as the release notes on GitHub.
 For a new release: raise `App::VERSION` in `src/App.php`, add a section `## [x.y.z] – YYYY-MM` here and merge the pull request.
 
+## [1.2.0] – 2026-11
+
+### Added
+- Sponsor of the MVP vote ([#4](https://github.com/laudatioUno/Crownd/issues/4)): under Einstellungen › Sponsor upload the sponsor's logo, enter its name (used as the image's alternative text) and an optional text such as «Präsentiert durch», shown large above the logo. Tick where it is shown: waiting page, ballot, thanks page, results and projector view, QR code poster. The logo appears large on a white card, so it also works on the dark projector view, where it gets its own row below the title.
+
+### Fixed
+- Settings: after a validation error, the club logo preview no longer disappeared from the form.
+
 ## [1.1.1] – 2026-11
 
 ### Added

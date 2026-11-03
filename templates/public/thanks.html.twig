@@ -10,6 +10,8 @@
     <h1 class="thanks__title">{{ t('vote.thanks_title') }}</h1>
     <p class="hero__text">{{ brand.thanks_text ?: (results ? '' : t('vote.thanks_text')) }}</p>
 
+    {% include 'partials/sponsor.html.twig' with {place: 'thanks', size: 'large'} %}
+
     <div class="choice-list">
       <h2 class="visually-hidden">{{ t('vote.your_vote') }}</h2>
       {% for side in ['home', 'away'] %}

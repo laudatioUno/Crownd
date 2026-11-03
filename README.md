@@ -4,7 +4,7 @@
 
 Works for any team sport; made for clubs that want their own tool on ordinary shared hosting (PHP + MySQL/MariaDB), without platform fees or tracking.
 
-> Version **1.1.1**. A step-by-step guide in German is in [docs/anleitung.md](docs/anleitung.md).
+> Version **1.2.0**. A step-by-step guide in German is in [docs/anleitung.md](docs/anleitung.md).
 
 ## Features
 
@@ -32,6 +32,7 @@ Works for any team sport; made for clubs that want their own tool on ordinary sh
 
 **Admin**
 - Several admin accounts, password login (Argon2id) with lockout after repeated failures
+- A sponsor with logo, name and text (e.g. «Präsentiert durch»), shown on the pages you choose: waiting page, ballot, thanks page, results/projector and QR code poster
 - Club name, logo, color, the name of the award («Player of the Match», «MVP», …) and the texts on the voting page are configurable
 - Delete all votes of a match (e.g. after a test run) or reopen a vote closed by mistake
 
