@@ -9,6 +9,13 @@
     {{ m.crown('crown crown--big') }}
     <h1 class="waiting__title">{{ t('vote.inactive_title') }}</h1>
     <p class="waiting__text">{{ brand.inactive_text ?: t('vote.inactive_text') }}</p>
+    <div class="waiting__refresh">
+      <a href="{{ url('/') }}" class="btn btn--primary btn--big" data-reload data-loading-text="{{ t('vote.reloading') }}">
+        <svg class="icon reload-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"/></svg>
+        <span data-reload-label>{{ t('vote.reload') }}</span>
+      </a>
+      {% if not current_user %}<p class="muted small">{{ t('vote.auto_check') }}</p>{% endif %}
+    </div>
   </div>
 
   {% if upcoming %}

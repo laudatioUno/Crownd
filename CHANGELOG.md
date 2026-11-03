@@ -4,6 +4,12 @@ All notable changes to Crownd. Versions follow [semantic versioning](https://sem
 The section of a version is used as the release notes on GitHub.
 For a new release: raise `App::VERSION` in `src/App.php`, add a section `## [x.y.z] – YYYY-MM` here and merge the pull request.
 
+## [1.1.1] – 2026-11
+
+### Added
+- «Neu laden» button on the page shown while no voting runs, so voters can check right away whether the voting has started (a plain link, works without JavaScript; shows «Wird geladen …» while loading).
+- The page also checks immediately when the phone screen is switched on again or the voter comes back from another app, in addition to the automatic check every 20 seconds.
+
 ## [1.1.0] – 2026-10
 
 ### Added
