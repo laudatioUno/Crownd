@@ -20,7 +20,7 @@ Works for any team sport; made for clubs that want their own tool on ordinary sh
 - One poll per match: home and away team, an optional template per team, competition, kick-off and venue
 - Line-up per match: tick who actually plays, load another template, or add players straight from the match sheet
 - One fixed link for every match (e.g. `https://example.ch/mvp`) and a printable QR code poster
-- The page shows «not open yet» (with a «Neu laden» button and an automatic check every 20 seconds) until an admin starts the vote – from the admin area or with one tap on the voting page itself (typically at half-time)
+- The page shows «not open yet» (with a «Neu laden» button) until an admin starts the vote – from the admin area or with one tap on the voting page itself (typically at half-time)
 - Optional automatic end after a number of minutes; only one vote runs at a time
 - Mobile-first ballot: one MVP per team on one ballot, large round player photos with the shirt number, big thumb-friendly button
 - One vote per device and match (random device cookie, stored only as a hash); a generous rate limit per network, a honeypot against bots

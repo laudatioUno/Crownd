@@ -22,7 +22,6 @@ return [
     'next_match' => 'Nächstes Spiel',
     'reload' => 'Neu laden',
     'reloading' => 'Wird geladen …',
-    'auto_check' => 'Die Seite prüft auch von selbst alle 20 Sekunden, ob die Abstimmung läuft.',
     'admin_start' => 'Du bist als Admin angemeldet.',
     'admin_start_button' => 'Abstimmung jetzt starten',
     'admin_manage' => 'Zur Verwaltung',

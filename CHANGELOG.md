@@ -8,7 +8,9 @@ For a new release: raise `App::VERSION` in `src/App.php`, add a section `## [x.y
 
 ### Added
 - «Neu laden» button on the page shown while no voting runs, so voters can check right away whether the voting has started (a plain link, works without JavaScript; shows «Wird geladen …» while loading).
-- The page also checks immediately when the phone screen is switched on again or the voter comes back from another app, in addition to the automatic check every 20 seconds.
+
+### Removed
+- The waiting page no longer reloads by itself every 20 seconds; voters reload it with the button when they want.
 
 ## [1.1.0] – 2026-10
 

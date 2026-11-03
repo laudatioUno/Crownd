@@ -79,17 +79,6 @@
     if (inner && inner.getAttribute('data-status') === 'open') { setTimeout(tick, 4000); }
   });
 
-  // Waiting page: check every 20 seconds whether the voting has started.
-  var waiting = document.querySelector('[data-auto-reload]');
-  if (waiting) {
-    setInterval(function () { if (!document.hidden) { window.location.reload(); } }, 20000);
-    // Phone screen was off or another app was open: check right away when coming back.
-    var hiddenAt = 0;
-    document.addEventListener('visibilitychange', function () {
-      if (document.hidden) { hiddenAt = Date.now(); } else if (hiddenAt && Date.now() - hiddenAt > 5000) { window.location.reload(); }
-    });
-  }
-
   // «Neu laden» button: a plain link to the page; shows that it is loading.
   each('[data-reload]', function (link) {
     link.addEventListener('click', function () {
