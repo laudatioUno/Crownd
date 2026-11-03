@@ -10,6 +10,7 @@
     <h1 class="hero__title">{{ m.matchup_names(match) }}</h1>
     {% set meta = m.match_meta(match)|trim %}{% if meta %}<p class="hero__text">{{ meta }}</p>{% endif %}
   </div>
+  {% include 'partials/sponsor.html.twig' with {place: 'results'} %}
   <div data-live-url="{{ url(live_url) }}">
     {% include 'partials/results.html.twig' %}
   </div>

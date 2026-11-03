@@ -76,6 +76,7 @@ final class View
             'current_path' => isset($this->app->request) ? $this->app->request->path : '/',
             'lang' => $this->app->translator->locale,
             'theme_version' => $this->themeVersion(),
+            'sponsor' => $this->safeSponsor(),
         ];
 
         return $this->twig->render($template, $data + $globals);
@@ -113,6 +114,19 @@ final class View
             return substr(md5($this->app->branding()->club()['primary_color'] . '|' . $this->app->teams()->colorFingerprint()), 0, 10);
         } catch (\Throwable) {
             return 'x';
+        }
+    }
+
+    /** @return array{logo: string, name: string, text: string, places: list<string>}|null */
+    private function safeSponsor(): ?array
+    {
+        if (!$this->app->config->isInstalled()) {
+            return null;
+        }
+        try {
+            return $this->app->branding()->sponsor();
+        } catch (\Throwable) {
+            return null;
         }
     }
 

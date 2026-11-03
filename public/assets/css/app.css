@@ -420,3 +420,22 @@ details.disclosure[open] > summary { margin-bottom: .75rem; }
 .mvp--preview .mvp__name { font-size: 1.25rem; }
 .cropped { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; border-radius: 50%; }
 .cropped img { position: absolute; left: 0; top: 0; max-width: none; object-fit: fill; }
+
+/* ───────────── Sponsor ───────────── */
+.sponsor { display: flex; flex-direction: column; align-items: center; gap: .4rem; margin: 1.25rem auto 0; text-align: center; }
+.sponsor__text { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.sponsor__logo { display: inline-flex; align-items: center; justify-content: center; background: #fff; border-radius: 12px; padding: .5rem .9rem; box-shadow: 0 1px 2px rgba(17,26,43,.06), 0 0 0 1px rgba(17,26,43,.06); }
+.sponsor__logo img { display: block; max-height: 48px; max-width: min(220px, 60vw); width: auto; height: auto; object-fit: contain; }
+.sponsor--large .sponsor__logo { padding: .75rem 1.25rem; }
+.sponsor--large .sponsor__logo img { max-height: 72px; max-width: min(280px, 70vw); }
+.sponsor--present { flex-direction: row; gap: .75rem; margin: 0 auto 0 0; }
+.sponsor--present .sponsor__text { color: #9AA8BC; }
+.sponsor--present .sponsor__logo img { max-height: 64px; max-width: 280px; }
+.present__head .sponsor--present { margin: 0; }
+.poster .sponsor { margin-top: 1.75rem; }
+.poster .sponsor__logo { box-shadow: none; }
+.poster .sponsor__logo img { max-height: 110px; max-width: 360px; }
+.sponsor-edit { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.sponsor-edit__preview { min-width: 160px; min-height: 80px; display: grid; place-items: center; background: #fff; border: 1.5px dashed var(--line-strong); border-radius: 12px; padding: .75rem; }
+.sponsor-edit__preview img { max-height: 64px; max-width: 220px; }
+.sponsor-places { display: grid; gap: .6rem; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }

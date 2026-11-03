@@ -10,6 +10,8 @@
     <p class="hero__text">{{ t('vote.intro') }}</p>
   </div>
 
+  {% include 'partials/sponsor.html.twig' with {place: 'ballot'} %}
+
   {% include 'partials/matchup.html.twig' %}
 
   {% if error %}<div class="notice notice--error" role="alert">{{ t(error) }}</div>{% endif %}

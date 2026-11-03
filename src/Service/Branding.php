@@ -37,6 +37,38 @@ final class Branding
         ];
     }
 
+    /** Places where the sponsor can be shown (settings › Sponsor). */
+    public const SPONSOR_PLACES = ['waiting', 'ballot', 'thanks', 'results', 'poster'];
+
+    /** Shown when the sponsor is set up for the first time. */
+    public const SPONSOR_DEFAULT_PLACES = ['waiting', 'ballot', 'thanks', 'results', 'poster'];
+
+    /**
+     * The sponsor, or null when none is set up (no logo).
+     *
+     * @return array{logo: string, name: string, text: string, places: list<string>}|null
+     */
+    public function sponsor(): ?array
+    {
+        $logo = $this->settings?->get('sponsor_logo') ?? '';
+        if ($logo === '') {
+            return null;
+        }
+
+        return [
+            'logo' => $logo,
+            'name' => trim($this->settings?->get('sponsor_name') ?? ''),
+            'text' => trim($this->settings?->get('sponsor_text') ?? ''),
+            'places' => self::parsePlaces($this->settings?->get('sponsor_places') ?? ''),
+        ];
+    }
+
+    /** @return list<string> known places from a comma separated list */
+    public static function parsePlaces(string $value): array
+    {
+        return array_values(array_intersect(self::SPONSOR_PLACES, array_map('trim', explode(',', $value))));
+    }
+
     /** Only #RRGGBB is accepted, so the value is safe to put into CSS. */
     public static function validColor(string $value): ?string
     {

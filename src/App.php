@@ -35,7 +35,7 @@ use Crownd\View\View;
  */
 final class App
 {
-    public const VERSION = '1.1.1';
+    public const VERSION = '1.2.0';
 
     public Config $config;
     public readonly Translator $translator;

@@ -15,6 +15,7 @@
         <span data-reload-label>{{ t('vote.reload') }}</span>
       </a>
     </div>
+    {% include 'partials/sponsor.html.twig' with {place: 'waiting', size: 'large'} %}
   </div>
 
   {% if upcoming %}

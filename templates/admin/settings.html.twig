@@ -35,6 +35,37 @@
       {{ m.field('privacy_url', t('settings.privacy_url'), values.privacy_url, errors, 'url', {optional: true, help: t('settings.privacy_url_help')}) }}
     </section>
 
+    <section class="card stack" id="sponsor">
+      <h2 class="h2">{{ t('settings.sponsor') }}</h2>
+      <p class="muted">{{ t('settings.sponsor_intro') }}</p>
+      <div class="sponsor-edit">
+        <div class="sponsor-edit__preview">
+          {% if values.sponsor_logo %}
+            <img src="{{ media(values.sponsor_logo) }}" alt="{{ values.sponsor_name }}">
+          {% else %}
+            <span class="muted small">{{ t('settings.sponsor_none') }}</span>
+          {% endif %}
+        </div>
+        <div class="stack-sm">
+          {{ m.field('sponsor_logo', t('settings.sponsor_logo'), '', errors, 'file', {optional: true, accept: 'image/png,image/jpeg,image/webp', help: t('settings.sponsor_logo_help')}) }}
+          {% if values.sponsor_logo %}<label class="check"><input type="checkbox" name="remove_sponsor_logo" value="1"> {{ t('settings.sponsor_remove') }}</label>{% endif %}
+        </div>
+      </div>
+      <div class="grid-2">
+        {{ m.field('sponsor_name', t('settings.sponsor_name'), values.sponsor_name, errors, 'text', {maxlength: 100, help: t('settings.sponsor_name_help')}) }}
+        {{ m.field('sponsor_text', t('settings.sponsor_text'), values.sponsor_text, errors, 'text', {optional: true, maxlength: 80, placeholder: t('settings.sponsor_text_placeholder'), help: t('settings.sponsor_text_help')}) }}
+      </div>
+      {% set chosen = values.sponsor_places|split(',') %}
+      <fieldset class="fieldset stack-sm">
+        <legend class="label">{{ t('settings.sponsor_places') }}</legend>
+        <div class="sponsor-places">
+          {% for place in sponsor_places %}
+            <label class="check"><input type="checkbox" name="sponsor_places[]" value="{{ place }}"{{ place in chosen ? ' checked' }}> <span>{{ t('settings.sponsor_place.' ~ place) }}<br><span class="muted small">{{ t('settings.sponsor_place_help.' ~ place) }}</span></span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+    </section>
+
     <button type="submit" class="btn btn--primary btn--big">{{ t('app.save') }}</button>
   </form>
 {% endblock %}
